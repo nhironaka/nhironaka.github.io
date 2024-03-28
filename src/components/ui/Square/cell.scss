@@ -1,0 +1,23 @@
+@use 'sass:map';
+@import '@scss/theme';
+
+.cell {
+  .wall {
+    &.top {
+      border-top-color: map.get($palette, 'bg-focus');
+    }
+    &.left {
+      border-left-color: map.get($palette, 'bg-focus');
+    }
+    &.right {
+      border-right-color: map.get($palette, 'bg-focus');
+    }
+    &.bottom {
+      border-bottom-color: map.get($palette, 'bg-focus');
+    }
+    &.all {
+      background: map.get($palette, 'bg-focus');
+      border-color: map.get($palette, 'bg-focus');
+    }
+  }
+}

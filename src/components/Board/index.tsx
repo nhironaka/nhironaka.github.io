@@ -1,46 +1,98 @@
-import { Cell } from '@components/Cell';
-import { BoardState, DEFAULT_GRID_COUNT } from '@services/BoardState';
-import { difficultyTypes } from '@shared/constants';
+import {
+  type Dispatch,
+  type SetStateAction,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
+
+import { ActiveToken } from '@components/ActiveToken';
+import { type BoardState } from '@services/BoardState';
+import { TOKENS } from '@shared/constants';
 import { coord } from '@shared/helpers';
-import { Difficulty } from '@shared/types/board';
-import { Box, Grid } from '@styles/jsx';
-import { useState } from 'react';
+import type { GoalState, Token, TokenState } from '@shared/types/board';
+import { Cell } from '../Cell';
+import { Box, Grid } from '../ui';
 
 interface Props {
-  gridSize?: number;
-  difficulty?: Difficulty;
+  activePlayer: number;
+  gridSize: number;
+  goalState: GoalState;
+  shadowTokenState: Record<string, Token>;
+  tokenState: TokenState;
+  board: BoardState;
+  setTokenState: Dispatch<SetStateAction<TokenState>>;
 }
 
 export function Board({
-  gridSize = DEFAULT_GRID_COUNT,
-  difficulty = difficultyTypes.EASY,
+  board,
+  goalState,
+  shadowTokenState,
+  tokenState,
+  setTokenState,
+  gridSize,
 }: Props) {
-  const [board, setBoard] = useState(new BoardState(gridSize, difficulty));
+  const [rendered, setRendered] = useState(false);
+
+  const boardRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    setRendered(true);
+  }, []);
+
   return (
-    <Box width="100%" height="100%" padding="4" borderRadius="sm">
+    <Box
+      width="full"
+      height="full"
+      p="4"
+      borderRadius="md"
+      position="relative"
+      overflow="auto"
+    >
       <Grid
-        width="100%"
         bg="bg.focus"
-        gap="px"
         borderRadius="md"
-        border="1px solid"
         borderColor="bg.focus"
+        border="1px solid"
+        gap="px"
+        ref={boardRef}
       >
-        {board.cells.map((row, idx) => {
+        {board.cells.map((columns, idx) => {
           return (
             <Grid
               key={idx}
               gap="px"
               borderRadius="md"
-              style={{ gridTemplateColumns: `repeat(${gridSize}, 1fr)` }}
+              gridTemplateColumns={`${gridSize}-1`}
             >
-              {row.map((cell) => {
-                return <Cell key={coord`${[cell.x, cell.y]}`} cell={cell} />;
+              {columns.map((cell) => {
+                const xy = coord`${[cell.x, cell.y]}`;
+                const goalToken = goalState[xy];
+                const shadowToken = shadowTokenState[xy];
+                return (
+                  <Cell
+                    key={xy}
+                    cell={cell}
+                    shadowToken={shadowToken}
+                    goalToken={goalToken}
+                  />
+                );
               })}
             </Grid>
           );
         })}
       </Grid>
+      {rendered &&
+        Object.values(TOKENS).map((token) => (
+          <ActiveToken
+            key={token}
+            token={token}
+            board={board}
+            boardRef={boardRef.current}
+            tokenState={tokenState}
+            setTokenState={setTokenState}
+          />
+        ))}
     </Box>
   );
 }

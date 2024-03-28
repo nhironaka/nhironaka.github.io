@@ -1,3 +1,5 @@
+import { getRandomInt } from '@shared/helpers';
+
 export class Randomizer<T> {
   private deck: Array<T>;
   private used: Set<number>;
@@ -16,7 +18,7 @@ export class Randomizer<T> {
 
     let randomIndex: number;
     do {
-      randomIndex = Math.floor(Math.random() * (this.deck.length + 1));
+      randomIndex = getRandomInt(this.deck.length);
     } while (this.used.has(randomIndex));
 
     this.used.add(randomIndex);
@@ -25,7 +27,7 @@ export class Randomizer<T> {
   }
 
   all() {
-    const items = new Array<T>();
+    const items: Array<T> = [];
 
     let item: T | null;
     do {
