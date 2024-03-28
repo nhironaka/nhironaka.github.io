@@ -1,108 +1,167 @@
 import { CellState } from '@services/CellState';
 import { Randomizer } from '@services/randomizer';
 import {
-  difficultyConfigs,
-  difficultyTypes,
-  wallConfigs,
+  DIFFICULTY_CONFIGS,
+  DIFFICULTY_TYPES,
+  DIRECTIONS,
+  WALL_CONFIGS,
 } from '@shared/constants';
-import { coord } from '@shared/helpers';
-import { Difficulty, WallConfig } from '@shared/types';
+import { coord, fromCoord } from '@shared/helpers';
+import {
+  allowedDirection,
+  generateMatrix,
+  getBoardCenter,
+  getInitialTokenState,
+  getRandomDifficulty,
+  getSurroundingCells,
+  isBoardEdge,
+  stoppedByCell,
+} from '@shared/helpers/board';
+import type { Coord, Difficulty, Direction, Token } from '@shared/types';
 
 export const DEFAULT_GRID_COUNT = 20;
+
+const TO_DIRECTION = {
+  [DIRECTIONS.TOP]: { x: -1, y: 0 },
+  [DIRECTIONS.BOTTOM]: { x: 1, y: 0 },
+  [DIRECTIONS.LEFT]: { x: 0, y: -1 },
+  [DIRECTIONS.RIGHT]: { x: 0, y: 1 },
+};
 
 export class BoardState {
   public cells: Array<Array<CellState>>;
   public difficulty: Difficulty;
+  public configedCells: Record<string, CellState>;
 
   constructor(
     gridSize = DEFAULT_GRID_COUNT,
-    difficulty: Difficulty = difficultyTypes.EASY,
+    difficulty: Difficulty = DIFFICULTY_TYPES.EASY,
   ) {
+    this.configedCells = {};
     this.difficulty = difficulty;
+
+    this.cells = this.generateCells(gridSize);
+  }
+
+  generateCells(gridSize: number) {
     const boardCenter = getBoardCenter(gridSize);
-    const difficultyConfig = { ...difficultyConfigs[difficulty] };
+    const difficultyConfig = { ...DIFFICULTY_CONFIGS[this.difficulty] };
     const numConfiguredCells = Object.values(difficultyConfig).reduce(
       (acc, val) => acc + val,
       0,
     );
+    const initialTokenState = getInitialTokenState(gridSize);
+    const startingPositions = Object.values(initialTokenState).map(
+      (xy) => coord`${xy}`,
+    );
+    const surroundingCells = getSurroundingCells(boardCenter, gridSize);
     const flatBoard = generateMatrix(
       gridSize,
       (row, column) => coord`${[row, column]}`,
     )
       .flat()
       .filter((xy) => {
-        const [row, column] = xy.split(', ').map(Number);
-        return !isEdge(row, column, gridSize) && !boardCenter.includes(xy);
+        const [row, column] = fromCoord(xy);
+        const boardEdge = isBoardEdge({ row, column, gridSize }) || [];
+
+        return (
+          boardEdge.length < 2 &&
+          !surroundingCells.includes(xy) &&
+          !startingPositions.includes(xy)
+        );
       });
     const randomCellSelector = new Randomizer(flatBoard, numConfiguredCells);
     const configuredCells = randomCellSelector.all();
 
-    this.cells = generateMatrix(gridSize, (row, column) => {
-      const isConfigured = configuredCells.includes(coord`${[row, column]}`);
-      const isCenter = boardCenter.includes(coord`${[row, column]}`);
+    return generateMatrix(gridSize, (row, column) => {
+      const strCoord = coord`${[row, column]}`;
+      const isConfigured = configuredCells.includes(strCoord);
+      const isCenter = boardCenter.includes(strCoord);
+
       const wallConfig = isCenter
-        ? wallConfigs.ALL
+        ? WALL_CONFIGS.ALL
         : isConfigured
           ? getRandomDifficulty(difficultyConfig)
-          : wallConfigs.NONE;
-      return new CellState(row, column, wallConfig);
+          : WALL_CONFIGS.NONE;
+
+      const cell = new CellState({
+        x: row,
+        y: column,
+        wallConfig,
+        gridSize,
+      });
+
+      if (isConfigured || isCenter) {
+        this.configedCells[strCoord] = cell;
+      }
+
+      return cell;
     });
   }
-}
 
-/* ----- Helpers ----- */
-
-const getBoardCenter = (gridSize: number) => {
-  const gridCenter = Math.floor(gridSize / 2);
-  const boardCenter = [`${gridCenter},${gridCenter}`];
-
-  if (gridSize % 2 === 0) {
-    boardCenter.push(
-      coord`${[gridCenter - 1, gridCenter]}`,
-      coord`${[gridCenter, gridCenter - 1]}`,
-      coord`${[gridCenter - 1, gridCenter - 1]}`,
+  inBounds([row, column]: Coord) {
+    return (
+      row >= 0 &&
+      column >= 0 &&
+      row < this.cells.length &&
+      column < this.cells[0].length
     );
   }
 
-  return boardCenter;
-};
+  getAdjacentCells(coord: Coord) {
+    const [x, y] = coord;
+    const {
+      [DIRECTIONS.TOP]: { x: topX, y: topY },
+      [DIRECTIONS.BOTTOM]: { x: bottomX, y: bottomY },
+      [DIRECTIONS.LEFT]: { x: leftX, y: leftY },
+      [DIRECTIONS.RIGHT]: { x: rightX, y: rightY },
+    } = TO_DIRECTION;
+    return Object.entries({
+      [DIRECTIONS.TOP]: [x + topX, y + topY],
+      [DIRECTIONS.BOTTOM]: [x + bottomX, y + bottomY],
+      [DIRECTIONS.LEFT]: [x + leftX, y + leftY],
+      [DIRECTIONS.RIGHT]: [x + rightX, y + rightY],
+    })
+      .filter(([_, coord]) => this.inBounds(coord as Coord))
+      .reduce(
+        (acc, [direction, [row, column]]) => {
+          acc[direction as Direction] = this.cells[row][column];
 
-const generateMatrix = <T>(
-  gridSize: number,
-  output: (row: number, column: number) => T,
-) => {
-  return new Array(gridSize).fill('').map((_, row) => {
-    return new Array(gridSize).fill('').map((_, column) => {
-      return output(row, column);
-    });
-  });
-};
-const isEdge = (row: number, column: number, gridSize: number) => {
-  return (
-    row === 0 || column === 0 || row === gridSize - 1 || column === gridSize - 1
-  );
-};
-const getRandomDifficulty = (
-  difficultyConfig: Partial<Record<WallConfig, number>>,
-) => {
-  let wallConfig =
-    Math.random() < 0.5 ? wallConfigs.SINGLE : wallConfigs.CORNER;
-  let remainingCount = difficultyConfig[wallConfig];
-  if (typeof remainingCount === 'number' && remainingCount > 0) {
-    difficultyConfig[wallConfig] = remainingCount - 1;
-
-    return wallConfig;
+          return acc;
+        },
+        {} as Record<Direction, CellState>,
+      );
   }
 
-  wallConfig =
-    wallConfig === wallConfigs.SINGLE ? wallConfigs.CORNER : wallConfigs.SINGLE;
+  getBlockingCoord(
+    xy: Coord,
+    direction: Direction,
+    tokenState: Record<Token, Coord>,
+  ): Coord {
+    const [x, y] = xy;
+    const { x: x1, y: y1 } = TO_DIRECTION[direction];
+    const tokens = Object.values(tokenState).map((xy) => coord`${xy}`);
+    const adjacentCoord: Coord = [x + x1, y + y1];
+    const adjCoordString = coord`${adjacentCoord}`;
 
-  remainingCount = difficultyConfig[wallConfig];
-  if (typeof remainingCount === 'number' && remainingCount > 0) {
-    difficultyConfig[wallConfig] = remainingCount - 1;
+    if (tokens.includes(adjCoordString)) {
+      return xy;
+    }
 
-    return wallConfig;
+    const configuredCell = this.configedCells[adjCoordString];
+    const blockedByNextCell =
+      configuredCell && stoppedByCell(configuredCell, direction);
+
+    if (this.inBounds(adjacentCoord) && blockedByNextCell) {
+      return adjacentCoord;
+    }
+    const validNextMove =
+      !configuredCell || allowedDirection(configuredCell, direction);
+
+    if (this.inBounds(adjacentCoord) && validNextMove) {
+      return this.getBlockingCoord(adjacentCoord, direction, tokenState);
+    }
+
+    return xy;
   }
-
-  return wallConfigs.NONE;
-};
+}

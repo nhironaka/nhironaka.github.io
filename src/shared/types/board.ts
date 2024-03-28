@@ -1,12 +1,27 @@
 import {
-  difficultyTypes,
-  wallConfigs,
-  wallTypes,
+  type DIFFICULTY_TYPES,
+  type DIRECTIONS,
+  type GOAL_TOKENS,
+  type PLAYERS,
+  type TOKENS,
+  type WALL_CONFIGS,
 } from '@shared/constants/board';
-import { ConstValues } from './utils';
+import { type ConstValues } from './utils';
 
-export type Wall = ConstValues<typeof wallTypes>;
+export type Direction = ConstValues<typeof DIRECTIONS>;
 
-export type Difficulty = ConstValues<typeof difficultyTypes>;
+export type Token = ConstValues<typeof TOKENS>;
 
-export type WallConfig = ConstValues<typeof wallConfigs>;
+export type GoalToken = ConstValues<typeof GOAL_TOKENS>;
+
+export type Difficulty = ConstValues<typeof DIFFICULTY_TYPES>;
+
+export type WallConfig = ConstValues<typeof WALL_CONFIGS>;
+
+export type Player = ConstValues<typeof PLAYERS>;
+
+export type Coord = [x: number, y: number];
+
+export type GoalState = Record<string, GoalToken>;
+
+export type TokenState = Record<Token, Coord>;
