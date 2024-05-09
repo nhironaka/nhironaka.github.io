@@ -57,8 +57,8 @@ export function ActiveToken({
         setClientRect({
           width: width - (isDesktop ? 2 : 1),
           height: height - (isDesktop ? 2 : 1),
-          top: top + parentTop * -1,
-          left: left + parentLeft * -1,
+          top: top + (isDesktop ? 1 : 0) + parentTop * -1,
+          left: left + (isDesktop ? 1 : 0) + parentLeft * -1,
         });
       }
     };

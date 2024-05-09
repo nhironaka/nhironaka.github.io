@@ -4,6 +4,7 @@ import { Board } from '@components/Board';
 import { Controller } from '@components/Controller';
 import { NextPlay } from '@components/NextPlay';
 import { Box, Flex } from '@components/ui';
+import { Button } from '@components/ui/Button';
 import { BoardState, DEFAULT_GRID_COUNT } from '@services/BoardState';
 import { Randomizer } from '@services/randomizer';
 import { DIFFICULTY_TYPES, GOAL_TOKENS, PLAYERS } from '@shared/constants';
@@ -13,6 +14,7 @@ import {
   getInitialTokenState,
   isAtGoal,
 } from '@shared/helpers/board';
+import { useMediaQuery } from '@shared/hooks/useMediaQueries';
 import {
   type Difficulty,
   type GoalState,
@@ -53,6 +55,11 @@ export function Game({
   difficulty = DIFFICULTY_TYPES.EASY,
   gridSize = DEFAULT_GRID_COUNT,
 }: Props) {
+  const isDesktop = useMediaQuery('(min-width: 768px)');
+  const [playerGoalState, setPlayerGoal] = useState({
+    [PLAYERS.ONE]: false,
+    [PLAYERS.TWO]: false,
+  });
   const altPlayerAnswer = useRef<TokenState>();
   const [activePlayer, setActivePlayer] = useState<Player>(PLAYERS.ONE);
   const [board, setBoard] = useState(new BoardState(gridSize, difficulty));
@@ -69,6 +76,7 @@ export function Game({
     new Array<{
       player: Player;
       numMoves: number;
+      tie?: boolean;
     }>(),
   );
 
@@ -89,15 +97,20 @@ export function Game({
     if (activePlayer === PLAYERS.ONE) {
       altPlayerAnswer.current = activeTokenState;
     }
+    setPlayerGoal((prev) => ({
+      ...prev,
+      [activePlayer]: atGoal,
+    }));
     setActiveTokenState(tokenState);
     setActivePlayer((prev) =>
       prev === PLAYERS.ONE ? PLAYERS.TWO : PLAYERS.ONE,
     );
+
     setNumMoves(0);
     setHistory([]);
   };
 
-  const onConfirm = (player: Player) => {
+  const onConfirm = (player: Player, tie = false) => {
     if (!altPlayerAnswer.current) {
       return;
     }
@@ -116,6 +129,7 @@ export function Game({
       prev.concat({
         player,
         numMoves,
+        tie,
       }),
     );
   };
@@ -145,10 +159,14 @@ export function Game({
     setNumMoves(0);
     setPlays(new Randomizer(goalTokens, goalTokens.length).all());
     altPlayerAnswer.current = undefined;
+    setPlayerGoal({
+      [PLAYERS.ONE]: false,
+      [PLAYERS.TWO]: false,
+    });
   };
 
   const switchPlayer = (player: Player) => {
-    if (atGoal) {
+    if (playerGoalState[PLAYERS.ONE] || playerGoalState[PLAYERS.TWO]) {
       onConfirm(player);
     } else {
       setActivePlayer((prev) =>
@@ -159,12 +177,9 @@ export function Game({
 
   return (
     <Flex flexDirection="column" gap="4">
+      <Button onClick={resetGame}>New game</Button>
       <Box textAlign="center">
-        <NextPlay
-          disabled={!atGoal}
-          currentPlay={currentPlay}
-          nextPlay={nextPlay}
-        />
+        <NextPlay currentPlay={currentPlay} nextPlay={nextPlay} />
       </Box>
       <Board
         shadowTokenState={shadowTokenState}
@@ -185,12 +200,11 @@ export function Game({
         activePlayer={activePlayer}
         numMoves={numMoves}
         undo={history.length > 0 ? undo : undefined}
-        atGoal={!!altPlayerAnswer.current || atGoal}
+        atGoal={playerGoalState}
         switchPlayer={switchPlayer}
-        resetGame={resetGame}
       />
 
-      <Flex flexDirection="column">
+      <Flex flexDirection="column" px={isDesktop ? '6' : '2'}>
         {submittedMoves.map(({ player, numMoves }, idx) => {
           return (
             <Box key={idx}>

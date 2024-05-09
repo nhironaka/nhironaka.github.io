@@ -7,9 +7,8 @@ import type { Player } from '@shared/types';
 interface Props {
   numMoves: number;
   activePlayer: Player;
-  atGoal: boolean;
+  atGoal: Record<Player, boolean>;
   switchPlayer(player: Player): void;
-  resetGame(): void;
   onSubmit?(): void;
   undo?(): void;
 }
@@ -17,7 +16,6 @@ interface Props {
 export function Controller({
   undo,
   onSubmit,
-  resetGame,
   switchPlayer,
   atGoal,
   activePlayer,
@@ -70,15 +68,14 @@ export function Controller({
             switchPlayer(PLAYERS.ONE);
           }}
         >
-          {atGoal ? 'Confirm player 1' : 'Switch to player 1'}
+          {atGoal[PLAYERS.ONE] ? 'Confirm player 1' : 'Switch to player 1'}
         </Button>
-        <Button onClick={resetGame}>New game</Button>
         <Button
           onClick={() => {
             switchPlayer(PLAYERS.TWO);
           }}
         >
-          {atGoal ? 'Confirm player 2' : 'Switch to player 2'}
+          {atGoal[PLAYERS.TWO] ? 'Confirm player 2' : 'Switch to player 2'}
         </Button>
       </Flex>
     </Flex>

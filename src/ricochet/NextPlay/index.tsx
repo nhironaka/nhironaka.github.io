@@ -3,21 +3,13 @@ import { Button } from '@components/ui/Button';
 import { type GoalToken as GoalTokenType } from '@shared/types';
 
 interface Props {
-  disabled: boolean;
   nextPlay(): void;
   currentPlay: GoalTokenType;
 }
 
-export function NextPlay({ disabled, nextPlay, currentPlay }: Props) {
+export function NextPlay({ nextPlay, currentPlay }: Props) {
   return (
-    <Button
-      buttonStyle="text"
-      onClick={() => {
-        if (!disabled) {
-          nextPlay();
-        }
-      }}
-    >
+    <Button buttonStyle="text" onClick={nextPlay}>
       <GoalToken
         display="flex"
         alignItems="center"
