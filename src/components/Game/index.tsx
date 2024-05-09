@@ -3,8 +3,7 @@ import { useRef, useState } from 'react';
 import { Board } from '@components/Board';
 import { Controller } from '@components/Controller';
 import { NextPlay } from '@components/NextPlay';
-import { Box, Divider, Flex } from '@components/ui';
-import { Button } from '@components/ui/Button';
+import { Box, Flex } from '@components/ui';
 import { BoardState, DEFAULT_GRID_COUNT } from '@services/BoardState';
 import { Randomizer } from '@services/randomizer';
 import { DIFFICULTY_TYPES, GOAL_TOKENS, PLAYERS } from '@shared/constants';
@@ -148,8 +147,18 @@ export function Game({
     altPlayerAnswer.current = undefined;
   };
 
+  const switchPlayer = (player: Player) => {
+    if (atGoal) {
+      onConfirm(player);
+    } else {
+      setActivePlayer((prev) =>
+        prev === PLAYERS.ONE ? PLAYERS.TWO : PLAYERS.ONE,
+      );
+    }
+  };
+
   return (
-    <Flex flexDirection="column">
+    <Flex flexDirection="column" gap="4">
       <Box textAlign="center">
         <NextPlay
           disabled={!atGoal}
@@ -176,32 +185,10 @@ export function Game({
         activePlayer={activePlayer}
         numMoves={numMoves}
         undo={history.length > 0 ? undo : undefined}
+        atGoal={atGoal}
+        switchPlayer={switchPlayer}
+        resetGame={resetGame}
       />
-
-      <Divider my="4" />
-
-      <Flex
-        display="flex"
-        width="full"
-        justifyContent="space-around"
-        alignItems="center"
-      >
-        <Button
-          onClick={() => {
-            onConfirm(PLAYERS.ONE);
-          }}
-        >
-          Confirm player 1
-        </Button>
-        <Button onClick={resetGame}>New game</Button>
-        <Button
-          onClick={() => {
-            onConfirm(PLAYERS.TWO);
-          }}
-        >
-          Confirm player 2
-        </Button>
-      </Flex>
 
       <Flex flexDirection="column">
         {submittedMoves.map(({ player, numMoves }, idx) => {
