@@ -2,7 +2,13 @@ import { useRef, useState } from 'react';
 
 import { Board } from '@components/Board';
 import { Controller } from '@components/Controller';
+import { NextPlay } from '@components/NextPlay';
 import { Box, Flex } from '@components/ui';
+import { Button } from '@components/ui/Button';
+import { BoardState, DEFAULT_GRID_COUNT } from '@services/BoardState';
+import { Randomizer } from '@services/randomizer';
+import { DIFFICULTY_TYPES, GOAL_TOKENS, PLAYERS } from '@shared/constants';
+import { coord } from '@shared/helpers';
 import {
   getGoalState,
   getInitialTokenState,
@@ -16,13 +22,7 @@ import {
   type Token,
   type TokenState,
 } from '@shared/types/board';
-
-import { NextPlay } from '@components/NextPlay';
-import { Button } from '@components/ui/Button';
-import { BoardState, DEFAULT_GRID_COUNT } from '@services/BoardState';
-import { Randomizer } from '@services/randomizer';
-import { DIFFICULTY_TYPES, GOAL_TOKENS, PLAYERS } from '@shared/constants';
-import { coord } from '@shared/helpers';
+import './game.scss';
 
 interface Props {
   gridSize?: number;

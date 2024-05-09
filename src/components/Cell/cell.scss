@@ -3,25 +3,32 @@
 
 .cell {
   .wall {
-    &.top {
-      border-top-color: map.get($palette, 'bg-focus');
-    }
-    &.left {
-      border-left-color: map.get($palette, 'bg-focus');
-    }
-    &.right {
-      border-right-color: map.get($palette, 'bg-focus');
-    }
+    &.top,
     &.bottom {
-      border-bottom-color: map.get($palette, 'bg-focus');
+      height: 1px;
+      width: 100%;
+
+      @media only screen and (min-width: 768px) {
+        height: 2px;
+      }
     }
-    &.all {
-      background: map.get($palette, 'bg-focus');
-      border-color: map.get($palette, 'bg-focus');
+
+    &.left,
+    &.right {
+      width: 1px;
+      height: 100%;
+
+      @media only screen and (min-width: 768px) {
+        width: 2px;
+      }
     }
   }
 
   .inner {
-    padding: 6px;
+    padding: 3px;
+
+    @media only screen and (min-width: 768px) {
+      padding: 6px;
+    }
   }
 }

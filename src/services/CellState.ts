@@ -28,25 +28,21 @@ interface CellStateOptions {
 }
 
 export class CellState {
-  private gridSize: number;
   public x: number;
   public y: number;
   public wallConfig: WallConfig;
   public walls: WallState | null;
-  public isMovable: boolean;
 
   constructor(opt: CellStateOptions) {
     const { x, y, wallConfig, gridSize } = opt;
-    this.gridSize = gridSize;
     this.x = x;
     this.y = y;
     this.wallConfig = wallConfig;
-    this.walls = this.generateWalls();
-    this.isMovable = false;
+    this.walls = this.generateWalls(gridSize);
   }
 
-  generateWalls() {
-    const cellArgs = { row: this.x, column: this.y, gridSize: this.gridSize };
+  private generateWalls(gridSize: number) {
+    const cellArgs = { row: this.x, column: this.y, gridSize };
     const edges = isBoardEdge(cellArgs);
     let wallState: WallState = {};
     let isEdge = false;

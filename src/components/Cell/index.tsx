@@ -12,6 +12,7 @@ import type {
 import { Wall } from './Wall';
 
 import { Token } from '@components/Token';
+import { useMediaQuery } from '@shared/hooks/useMediaQueries';
 import './cell.scss';
 
 interface Props {
@@ -24,14 +25,25 @@ export function Cell({ cell, goalToken, shadowToken }: Props) {
   const { x, y, wallConfig } = cell;
   const cellPos = coord`${[x, y]}`;
   const walls = getWallConfig({ cell });
+  const isDesktop = useMediaQuery('(min-width: 768px)');
 
   return (
-    <Square data-key={cellPos} bg="bg.hover" borderRadius="md" className="cell">
-      <Box width="full" p="qtr" height="full" position="relative">
+    <Square
+      data-key={cellPos}
+      bg="bg.hover"
+      borderRadius={isDesktop ? 'md' : 'sm'}
+      className="cell"
+    >
+      <Box
+        width="full"
+        p={isDesktop ? 'qtr' : 'px'}
+        height="full"
+        position="relative"
+      >
         <Box
           width="full"
           height="full"
-          borderRadius="md"
+          borderRadius={isDesktop ? 'md' : 'sm'}
           position="relative"
           bg={wallConfig === WALL_CONFIGS.ALL ? 'bg.focus' : undefined}
         >

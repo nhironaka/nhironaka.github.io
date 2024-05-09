@@ -9,8 +9,10 @@ import { CellAction } from '@components/CellActions';
 import { Token } from '@components/Token';
 import { Popover } from '@components/ui/Popover';
 import type { BoardState } from '@services/BoardState';
+import type { CellState } from '@services/CellState';
 import { coord } from '@shared/helpers';
-import type { Coord, Token as TokenType } from '@shared/types';
+import { useMediaQuery } from '@shared/hooks/useMediaQueries';
+import type { Coord, TokenState, Token as TokenType } from '@shared/types';
 import { MotionBox } from '../ui';
 import './token.scss';
 
@@ -18,7 +20,8 @@ interface Props {
   board: BoardState;
   token: TokenType;
   boardRef: HTMLDivElement | null;
-  tokenState: Record<TokenType, Coord>;
+  cell: CellState;
+  tokenState: TokenState;
   setTokenState: Dispatch<SetStateAction<Record<TokenType, Coord>>>;
 }
 
@@ -26,19 +29,21 @@ export function ActiveToken({
   board,
   token,
   boardRef,
+  cell,
   tokenState,
   setTokenState,
 }: Props) {
-  const coordinates = tokenState[token];
+  const { x, y } = cell;
+  const coordinates = coord`${[x, y]}`;
   const [clientRect, setClientRect] =
     useState<Pick<DOMRect, 'left' | 'top' | 'width' | 'height'>>();
+  const isDesktop = useMediaQuery('(min-width: 768px)');
 
   useLayoutEffect(() => {
     const adjustLocation = () => {
-      const boardCell = coordinates
-        ? boardRef?.querySelector(`[data-key="${coord`${coordinates}`}"]`)
-        : false;
-      if (boardCell) {
+      const boardCell = boardRef?.querySelector(`[data-key="${coordinates}"]`);
+      const boardInner = boardCell?.querySelector('.inner');
+      if (boardCell && boardInner) {
         const { left, top, width, height } = boardCell.getBoundingClientRect();
         const parentElem =
           boardCell instanceof HTMLElement && boardCell.offsetParent;
@@ -50,10 +55,10 @@ export function ActiveToken({
             };
 
         setClientRect({
-          width: width - 2,
-          height: height - 2,
-          top: top + 1 + parentTop * -1,
-          left: left + 1 + parentLeft * -1,
+          width: width - (isDesktop ? 2 : 1),
+          height: height - (isDesktop ? 2 : 1),
+          top: top + parentTop * -1,
+          left: left + parentLeft * -1,
         });
       }
     };
@@ -63,7 +68,7 @@ export function ActiveToken({
     return () => {
       window.removeEventListener('resize', adjustLocation);
     };
-  }, [coordinates, boardRef]);
+  }, [coordinates, isDesktop, boardRef]);
 
   return (
     <Popover
@@ -72,7 +77,7 @@ export function ActiveToken({
         <CellAction
           token={token}
           setTokenState={setTokenState}
-          coord={coordinates}
+          coord={[x, y]}
           board={board}
           tokenState={tokenState}
         />
@@ -80,7 +85,7 @@ export function ActiveToken({
     >
       <MotionBox
         position="absolute"
-        p="1"
+        p={isDesktop ? '1' : 'qtr'}
         style={{
           left: clientRect?.left ?? 0,
           top: clientRect?.top ?? 0,

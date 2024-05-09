@@ -31,6 +31,7 @@
 @include generate-from-map(border-top-color, $borders, border-top-color);
 @include generate-from-map(border-bottom-color, $borders, border-bottom-color);
 
+@include generate-from-map(bg, $palette, background);
 @include generate-from-map(color, $palette, color);
 @include generate-from-map(border-color, $palette, border-color);
 @include generate-from-map(border-left-color, $palette, border-left-color);
@@ -42,8 +43,6 @@
 @include generate-from-map(left, $spacing, left);
 @include generate-from-map(bottom, $spacing, bottom);
 @include generate-from-map(right, $spacing, right);
-@include generate-from-map(bg, $spacing, background);
-@include generate-from-map(bg, $palette, background);
 @include generate-from-map(gap, $spacing, gap);
 @include generate-from-map(p, $spacing, padding);
 @include generate-from-map(pl, $spacing, padding-left);
@@ -60,12 +59,9 @@
 @include generate-from-map(width, $spacing, width);
 @include generate-from-map(max-width, $spacing, max-width);
 @include generate-from-map(max-height, $spacing, max-height);
-@include generate-percentiles(width, 25, 50, 75);
-@include generate-percentiles(max-width, 25, 50, 75);
-@include generate-percentiles(height, 25, 50, 75);
-@include generate-percentiles(max-height, 25, 50, 75);
-@include generate-percentiles(opacity, 10, 25, 50, 60, 75, 90);
 @include generate-from-map(height, $spacing, height);
+@include generate-from-map-multi(px, $spacing, padding-left, padding-right);
+@include generate-from-map-multi(py, $spacing, padding-top, padding-bottom);
 @include generate-from-map(border-radius, $radii, border-radius);
 @include generate-from-map(
   border-top-left-radius,
@@ -96,12 +92,11 @@
 @include generate-class(whitespace, nowrap, normal, break-spaces);
 @include generate-grid(grid-template-columns, 25);
 
-@include generate-from-map-multi(px, $spacing, padding-left, padding-right);
-@include generate-from-map-multi(py, $spacing, padding-top, padding-bottom);
-
-.p-2px {
-  padding: 2px;
-}
+@include generate-percentiles(width, 25, 50, 75);
+@include generate-percentiles(max-width, 25, 50, 75);
+@include generate-percentiles(height, 25, 50, 75);
+@include generate-percentiles(max-height, 25, 50, 75);
+@include generate-percentiles(opacity, 10, 25, 50, 60, 75, 90);
 
 .border-none {
   border-width: 0px;

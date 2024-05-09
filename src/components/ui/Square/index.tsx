@@ -1,12 +1,15 @@
 import { forwardRef } from 'react';
 
 import { Box } from '@components/ui';
+import { useMediaQuery } from '@shared/hooks/useMediaQueries';
 import type { ComponentAttributes } from '@shared/types';
 
 export const Square = forwardRef<
   HTMLDivElement,
   ComponentAttributes<HTMLDivElement>
 >(({ children, ...rest }, ref) => {
+  const isDesktop = useMediaQuery('(min-width: 768px)');
+
   return (
     <Box width="full" position="relative" className="cell" {...rest} ref={ref}>
       <Box mt="full" />
@@ -16,7 +19,7 @@ export const Square = forwardRef<
         height="full"
         top="0"
         left="0"
-        borderRadius="md"
+        borderRadius={isDesktop ? 'md' : 'sm'}
         position="absolute"
       >
         {children}

@@ -1,0 +1,7 @@
+.board {
+  padding: 4px;
+
+  @media only screen and (min-width: 768px) {
+    padding: 24px;
+  }
+}

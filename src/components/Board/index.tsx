@@ -10,6 +10,7 @@ import { ActiveToken } from '@components/ActiveToken';
 import { type BoardState } from '@services/BoardState';
 import { TOKENS } from '@shared/constants';
 import { coord } from '@shared/helpers';
+import { useMediaQuery } from '@shared/hooks/useMediaQueries';
 import type { GoalState, Token, TokenState } from '@shared/types/board';
 import { Cell } from '../Cell';
 import { Box, Grid } from '../ui';
@@ -35,6 +36,7 @@ export function Board({
   const [rendered, setRendered] = useState(false);
 
   const boardRef = useRef<HTMLDivElement>(null);
+  const isDesktop = useMediaQuery('(min-width: 768px)');
 
   useLayoutEffect(() => {
     setRendered(true);
@@ -44,7 +46,6 @@ export function Board({
     <Box
       width="full"
       height="full"
-      p="4"
       borderRadius="md"
       position="relative"
       overflow="auto"
@@ -52,7 +53,7 @@ export function Board({
     >
       <Grid
         bg="bg.focus"
-        borderRadius="md"
+        borderRadius={isDesktop ? 'md' : 'sm'}
         borderColor="bg.focus"
         border="1px solid"
         gap="px"
@@ -63,7 +64,7 @@ export function Board({
             <Grid
               key={idx}
               gap="px"
-              borderRadius="md"
+              borderRadius={isDesktop ? 'md' : 'sm'}
               gridTemplateColumns={`${gridSize}-1`}
             >
               {columns.map((cell) => {
@@ -84,16 +85,29 @@ export function Board({
         })}
       </Grid>
       {rendered &&
-        Object.values(TOKENS).map((token) => (
-          <ActiveToken
-            key={token}
-            token={token}
-            board={board}
-            boardRef={boardRef.current}
-            tokenState={tokenState}
-            setTokenState={setTokenState}
-          />
-        ))}
+        Object.values(TOKENS).map((token) => {
+          const coordinates = coord`${tokenState[token]}`;
+
+          const cell = board.cells
+            .flatMap((cells) => cells)
+            .find(({ x, y }) => coord`${[x, y]}` === coordinates);
+
+          if (!cell) {
+            throw new Error(`No cell for token at ${coordinates}`);
+          }
+
+          return (
+            <ActiveToken
+              key={token}
+              cell={cell}
+              token={token}
+              board={board}
+              boardRef={boardRef.current}
+              tokenState={tokenState}
+              setTokenState={setTokenState}
+            />
+          );
+        })}
     </Box>
   );
 }
