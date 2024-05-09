@@ -58,3 +58,21 @@ export const Text = forwardRef<
 ));
 
 Text.displayName = 'Text';
+
+export const Divider = forwardRef<
+  HTMLDivElement,
+  ComponentAttributes<HTMLDivElement>
+>((props, ref) => {
+  return (
+    <Box
+      ref={ref}
+      height="px"
+      width="full"
+      borderTop="1px solid"
+      borderTopColor="primary"
+      {...props}
+    />
+  );
+});
+
+Divider.displayName = 'Divider';

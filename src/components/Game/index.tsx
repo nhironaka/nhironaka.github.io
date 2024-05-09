@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { Board } from '@components/Board';
 import { Controller } from '@components/Controller';
 import { NextPlay } from '@components/NextPlay';
-import { Box, Flex } from '@components/ui';
+import { Box, Divider, Flex } from '@components/ui';
 import { Button } from '@components/ui/Button';
 import { BoardState, DEFAULT_GRID_COUNT } from '@services/BoardState';
 import { Randomizer } from '@services/randomizer';
@@ -66,6 +66,12 @@ export function Game({
   const [history, setHistory] = useState<Array<TokenState>>([]);
   const [numMoves, setNumMoves] = useState(0);
   const shadowTokenState = reverseTokenState(tokenState);
+  const [submittedMoves, setSubmittedMoves] = useState(
+    new Array<{
+      player: Player;
+      numMoves: number;
+    }>(),
+  );
 
   const reverseTokenMap = reverseTokenState(activeTokenState);
   const [currentPlay] = plays;
@@ -81,7 +87,7 @@ export function Game({
   };
 
   const onSubmit = () => {
-    if (activePlayer === 1) {
+    if (activePlayer === PLAYERS.ONE) {
       altPlayerAnswer.current = activeTokenState;
     }
     setActiveTokenState(tokenState);
@@ -92,11 +98,11 @@ export function Game({
     setHistory([]);
   };
 
-  const onConfirm = (player: number) => {
+  const onConfirm = (player: Player) => {
     if (!altPlayerAnswer.current) {
       return;
     }
-    if (player === 1) {
+    if (player === PLAYERS.ONE) {
       setTokenState(altPlayerAnswer.current);
       setActiveTokenState(altPlayerAnswer.current);
     } else {
@@ -107,6 +113,12 @@ export function Game({
     nextPlay();
     setNumMoves(0);
     setHistory([]);
+    setSubmittedMoves((prev) =>
+      prev.concat({
+        player,
+        numMoves,
+      }),
+    );
   };
 
   const undo = () => {
@@ -166,18 +178,17 @@ export function Game({
         undo={history.length > 0 ? undo : undefined}
       />
 
+      <Divider my="4" />
+
       <Flex
         display="flex"
         width="full"
         justifyContent="space-around"
         alignItems="center"
-        py="4"
-        borderTop="1px solid"
-        borderTopColor="primary"
       >
         <Button
           onClick={() => {
-            onConfirm(1);
+            onConfirm(PLAYERS.ONE);
           }}
         >
           Confirm player 1
@@ -185,11 +196,21 @@ export function Game({
         <Button onClick={resetGame}>New game</Button>
         <Button
           onClick={() => {
-            onConfirm(2);
+            onConfirm(PLAYERS.TWO);
           }}
         >
           Confirm player 2
         </Button>
+      </Flex>
+
+      <Flex flexDirection="column">
+        {submittedMoves.map(({ player, numMoves }, idx) => {
+          return (
+            <Box key={idx}>
+              Round {idx + 1}: Player {player} - {numMoves} moves
+            </Box>
+          );
+        })}
       </Flex>
     </Flex>
   );
