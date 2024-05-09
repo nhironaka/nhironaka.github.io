@@ -185,7 +185,7 @@ export function Game({
         activePlayer={activePlayer}
         numMoves={numMoves}
         undo={history.length > 0 ? undo : undefined}
-        atGoal={atGoal}
+        atGoal={!!altPlayerAnswer.current || atGoal}
         switchPlayer={switchPlayer}
         resetGame={resetGame}
       />
