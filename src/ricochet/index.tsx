@@ -1,20 +1,16 @@
 import { useRef, useState } from 'react';
 
-import { Board } from '@components/Board';
-import { Controller } from '@components/Controller';
-import { NextPlay } from '@components/NextPlay';
-import { Box, Flex } from '@components/ui';
-import { Button } from '@components/ui/Button';
-import { BoardState, DEFAULT_GRID_COUNT } from '@services/BoardState';
-import { Randomizer } from '@services/randomizer';
-import { DIFFICULTY_TYPES, GOAL_TOKENS, PLAYERS } from '@shared/constants';
-import { coord } from '@shared/helpers';
-import {
-  getGoalState,
-  getInitialTokenState,
-  isAtGoal,
-} from '@shared/helpers/board';
 import { useMediaQuery } from '@shared/hooks/useMediaQueries';
+import { Button } from '@ui/Button';
+import { Box, Flex } from '@ui/index';
+import { Board } from './components/Board';
+import { Controller } from './components/Controller';
+import { NextPlay } from './components/NextPlay';
+import { DIFFICULTY_TYPES, GOAL_TOKENS, PLAYERS } from './constants/board';
+import { coord } from './helpers';
+import { getGoalState, getInitialTokenState, isAtGoal } from './helpers/board';
+import { BoardState, DEFAULT_GRID_COUNT } from './services/BoardState';
+import { Randomizer } from './services/randomizer';
 import {
   type Difficulty,
   type GoalState,
@@ -22,7 +18,8 @@ import {
   type Player,
   type Token,
   type TokenState,
-} from '@shared/types/board';
+} from './types/board';
+
 import './game.scss';
 
 interface Props {
@@ -31,23 +28,17 @@ interface Props {
 }
 
 function reverseTokenState(map: TokenState) {
-  return Object.entries(map).reduce(
-    (acc, [token, xy]) => {
-      acc[coord`${xy}`] = token as Token;
-      return acc;
-    },
-    {} as Record<string, Token>,
-  );
+  return Object.entries(map).reduce((acc, [token, xy]) => {
+    acc[coord`${xy}`] = token as Token;
+    return acc;
+  }, {} as Record<string, Token>);
 }
 
 function reverseGoalState(map: GoalState) {
-  return Object.entries(map).reduce(
-    (acc, [xy, token]) => {
-      acc[token as GoalToken] = xy;
-      return acc;
-    },
-    {} as Record<GoalToken, string>,
-  );
+  return Object.entries(map).reduce((acc, [xy, token]) => {
+    acc[token as GoalToken] = xy;
+    return acc;
+  }, {} as Record<GoalToken, string>);
 }
 const goalTokens = Object.values(GOAL_TOKENS);
 
@@ -65,7 +56,7 @@ export function Game({
   const [board, setBoard] = useState(new BoardState(gridSize, difficulty));
   const [tokenState, setTokenState] = useState(getInitialTokenState(gridSize));
   const [plays, setPlays] = useState(
-    new Randomizer(goalTokens, goalTokens.length).all(),
+    new Randomizer(goalTokens, goalTokens.length).all()
   );
   const [activeTokenState, setActiveTokenState] = useState(tokenState);
   const [goalState, setGoalState] = useState(getGoalState(board));
@@ -77,7 +68,7 @@ export function Game({
       player: Player;
       numMoves: number;
       tie?: boolean;
-    }>(),
+    }>()
   );
 
   const reverseTokenMap = reverseTokenState(activeTokenState);
@@ -103,7 +94,7 @@ export function Game({
     }));
     setActiveTokenState(tokenState);
     setActivePlayer((prev) =>
-      prev === PLAYERS.ONE ? PLAYERS.TWO : PLAYERS.ONE,
+      prev === PLAYERS.ONE ? PLAYERS.TWO : PLAYERS.ONE
     );
 
     setNumMoves(0);
@@ -130,7 +121,7 @@ export function Game({
         player,
         numMoves,
         tie,
-      }),
+      })
     );
   };
 
@@ -170,7 +161,7 @@ export function Game({
       onConfirm(player);
     } else {
       setActivePlayer((prev) =>
-        prev === PLAYERS.ONE ? PLAYERS.TWO : PLAYERS.ONE,
+        prev === PLAYERS.ONE ? PLAYERS.TWO : PLAYERS.ONE
       );
     }
   };

@@ -1,64 +1,35 @@
 {
-  "name": "my-app",
-  "version": "0.1.0",
-  "homepage": "https://nhironaka.github.io/kjDWz9X3MB",
+  "name": "kjdwz9x3mb-2",
   "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
   "dependencies": {
     "@floating-ui/react": "^0.26.10",
     "@heroicons/react": "^2.1.3",
     "classnames": "^2.5.1",
     "framer-motion": "^11.0.20",
     "lodash": "^4.17.21",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "sass": "^1.72.0",
-    "web-vitals": "^2.1.4"
-  },
-  "scripts": {
-    "start": "craco start",
-    "build": "craco build",
-    "test": "craco test",
-    "eject": "react-scripts eject",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@craco/craco": "^7.1.0",
-    "@craco/types": "^7.1.0",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/eslint": "^8.56.6",
-    "@types/jest": "^27.5.2",
-    "@types/lodash": "^4.17.0",
-    "@types/node": "^16.18.91",
-    "@types/react": "^18.2.69",
-    "@types/react-dom": "^18.2.22",
-    "@typescript-eslint/eslint-plugin": "^6.4.0",
-    "autoprefixer": "^10.4.19",
-    "circular-dependency-plugin": "^5.2.2",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@typescript-eslint/eslint-plugin": "^7.15.0",
+    "@typescript-eslint/parser": "^7.15.0",
+    "@vitejs/plugin-react": "^4.3.1",
     "eslint": "^8.57.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.1.3",
-    "eslint-plugin-promise": "^6.0.0",
-    "eslint-plugin-react": "^7.34.1",
-    "gh-pages": "^6.1.1",
-    "prettier": "^3.2.5",
-    "react-scripts": "5.0.1",
-    "typescript": "^4.9.5",
-    "typescript-eslint": "^7.3.1"
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.7",
+    "sass": "^1.77.8",
+    "typescript": "^5.2.2",
+    "vite": "^5.3.4",
+    "vite-plugin-circular-dependency": "^0.4.1"
   }
 }
