@@ -18,6 +18,8 @@ import {
 } from '@heroicons/react/24/outline';
 import { type ComponentProps } from 'react';
 
+import { css } from '@styled/css';
+import { Box } from '@styled/jsx';
 import { GOAL_TOKENS } from '../../constants/board';
 import { Token } from '../Token';
 
@@ -42,9 +44,16 @@ const goalTokenBrand = {
 
 export function GoalToken({ token, ...rest }: ComponentProps<typeof Token>) {
   const Icon = goalTokenBrand[token];
+
   return (
     <Token token={token} {...rest}>
-      <Icon className="token-icon" />
+      <Box
+        width="full"
+        color="inherit"
+        className={css({ invert: 1, grayscale: 1, contrast: 9 })}
+      >
+        <Icon />
+      </Box>
     </Token>
   );
 }

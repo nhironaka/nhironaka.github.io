@@ -1,12 +1,11 @@
-import { Color } from "src/connect/types";
+import { MotionBox } from '@ui/Motion';
+import { Color } from './types';
 
 interface Props {
-    color: Color;
-    residingToken: Color | undefined;
+  color: Color;
+  residingToken: Color | undefined;
 }
 
-export function Square({ color, residingToken,  }: Props) {
-    return (
-        
-    )
+export function Square(_props: Props) {
+  return <MotionBox></MotionBox>;
 }

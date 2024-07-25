@@ -1,46 +1,46 @@
-import classNames from 'classnames';
-import type { ComponentProps, ReactNode } from 'react';
+import { forwardRef, type ReactNode } from 'react';
 
-import { useMediaQuery } from '@shared/hooks/useMediaQueries';
-import { type Box, Flex } from '@ui/index';
-import { TOKENS } from '../../constants/board';
-import type { GoalToken, Token } from '../../types/board';
-import './token.scss';
+import { styled, type FlexProps } from '@styled/jsx';
+import type { GoalToken, Token as TokenType } from '../../types/board';
 
-interface Props extends ComponentProps<typeof Box> {
-  token: GoalToken | Token;
+interface Props extends Omit<FlexProps, 'direction'> {
+  token: GoalToken | TokenType;
   children?: ReactNode;
 }
 
-const tokenColors: Record<Token, string> = {
-  [TOKENS.RED]: 'error-focus',
-  [TOKENS.PURPLE]: 'success-focus',
-  [TOKENS.GREEN]: 'success-hover',
-  [TOKENS.YELLOW]: 'cell-focus',
+const getToken = (token: TokenType | GoalToken) => {
+  return token.replace(/\d+/, '') as TokenType;
 };
 
-const getToken = (token: Token | GoalToken) => {
-  return token.replace(/\d+/, '') as Token;
-};
+const StyledToken = styled('div', {
+  base: {
+    display: 'flex',
+    width: { base: 'calc(100% - 2px)', lg: 'calc(100% - 4px)' },
+    height: { base: 'calc(100% - 2px)', lg: 'calc(100% - 4px)' },
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: { base: 'xs', lg: 'sm' },
+  },
+  variants: {
+    tokenColor: {
+      red: { bg: 'red.300' },
+      purple: { bg: 'violet.300' },
+      green: { bg: 'green.200' },
+      yellow: { bg: 'orange.300' },
+    },
+  },
+});
 
-export function Token({ token, children, ...rest }: Props) {
-  const tokenColor = getToken(token);
-  const isDesktop = useMediaQuery('(min-width: 768px)');
+export const Token = forwardRef<HTMLDivElement, Props>(
+  ({ token, children, ...rest }, ref) => {
+    const tokenColor = getToken(token);
 
-  return (
-    <Flex
-      borderRadius={isDesktop ? 'md' : 'sm'}
-      width="full"
-      height="full"
-      justifyContent="center"
-      alignItems="center"
-      className={classNames(
-        'token',
-        token ? `bg-${tokenColors[tokenColor]}` : ''
-      )}
-      {...rest}
-    >
-      {children}
-    </Flex>
-  );
-}
+    return (
+      <StyledToken tokenColor={tokenColor} ref={ref} {...rest}>
+        {children}
+      </StyledToken>
+    );
+  },
+);
+
+Token.displayName = 'Token';

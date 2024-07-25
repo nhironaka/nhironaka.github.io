@@ -6,7 +6,7 @@ import {
   type ReactElement,
 } from 'react';
 
-import { usePopoverContext } from './context';
+import { usePopoverContext } from './hooks';
 
 interface PopoverTriggerProps {
   children: ReactElement;
@@ -16,8 +16,8 @@ export const PopoverTrigger = forwardRef<
   HTMLElement,
   HTMLProps<HTMLElement> & PopoverTriggerProps
 >(({ children, ...props }, propRef) => {
-  const { getReferenceProps, open, refs, setOpen } = usePopoverContext();
-  const ref = useMergeRefs([refs.setReference, propRef]);
+  const { getReferenceProps, open, refs } = usePopoverContext();
+  const ref = useMergeRefs([refs.setReference, (children as any).ref, propRef]);
 
   return cloneElement(
     children,
@@ -25,9 +25,6 @@ export const PopoverTrigger = forwardRef<
       ref,
       ...props,
       ...children.props,
-      onMouseEnter() {
-        setOpen(true);
-      },
       'data-state': open ? 'open' : 'closed',
     }),
   );

@@ -1,8 +1,7 @@
-import { useMediaQuery } from '@shared/hooks/useMediaQueries';
-import { Box } from '@ui/index';
+import { coord } from '@shared/helpers/grid';
+import { Box } from '@styled/jsx';
 import { Square } from '@ui/Square';
 import { WALL_CONFIGS } from '../../constants/board';
-import { coord } from '../../helpers';
 import { getWallConfig } from '../../helpers/board';
 import { type CellState } from '../../services/CellState';
 import type {
@@ -12,8 +11,6 @@ import type {
 import { GoalToken } from '../GoalToken';
 import { Token } from '../Token';
 import { Wall } from './Wall';
-
-import './cell.scss';
 
 interface Props {
   cell: CellState;
@@ -25,59 +22,57 @@ export function Cell({ cell, goalToken, shadowToken }: Props) {
   const { x, y, wallConfig } = cell;
   const cellPos = coord`${[x, y]}`;
   const walls = getWallConfig({ cell });
-  const isDesktop = useMediaQuery('(min-width: 768px)');
 
   return (
     <Square
       data-key={cellPos}
-      bg="bg.hover"
-      borderRadius={isDesktop ? 'md' : 'sm'}
+      bg="amber.100"
+      borderRadius={{ base: 'sm', lg: 'md' }}
       className="cell"
+      {...((shadowToken || goalToken) && {
+        'data-token': shadowToken || goalToken,
+      })}
     >
       <Box
         width="full"
-        p={isDesktop ? 'qtr' : 'px'}
+        p={{ base: '0.5', lg: '1' }}
         height="full"
         position="relative"
       >
         <Box
           width="full"
           height="full"
-          borderRadius={isDesktop ? 'md' : 'sm'}
+          borderRadius={{ base: 'sm', lg: 'md' }}
           position="relative"
-          bg={wallConfig === WALL_CONFIGS.ALL ? 'bg.focus' : undefined}
+          bg={wallConfig === WALL_CONFIGS.ALL ? 'amber.900' : undefined}
         >
           {walls.map((wall) => (
             <Wall key={wall} direction={wall} />
           ))}
         </Box>
         <Box
-          className="inner"
+          p={{ base: '4px', lg: '6px' }}
           width="full"
           height="full"
           top="0"
           left="0"
           position="absolute"
         >
-          <Box width="full" height="full" position="relative">
+          <Box className="inner" width="full" height="full" position="relative">
             {shadowToken && (
               <Token
                 opacity="50"
                 position="absolute"
-                top="0"
-                left="0"
-                width="full"
-                height="full"
+                top={{ base: '1px', md: '0.5' }}
+                left={{ base: '1px', md: '0.5' }}
                 token={shadowToken}
               />
             )}
             {goalToken && (
               <GoalToken
                 position="absolute"
-                top="0"
-                left="0"
-                width="full"
-                height="full"
+                top={{ base: '1px', md: '0.5' }}
+                left={{ base: '1px', md: '0.5' }}
                 token={goalToken}
               />
             )}

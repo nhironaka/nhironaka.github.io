@@ -9,12 +9,12 @@ interface Props {
 
 export function NextPlay({ nextPlay, currentPlay }: Props) {
   return (
-    <Button buttonStyle="text" onClick={nextPlay}>
+    <Button buttonStyle="text" color="neutral.900" onClick={nextPlay}>
       <GoalToken
         display="flex"
         alignItems="center"
         justifyContent="center"
-        width="8"
+        width="10"
         height="10"
         token={currentPlay}
       />

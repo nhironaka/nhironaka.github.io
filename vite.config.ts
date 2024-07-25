@@ -14,6 +14,7 @@ export default defineConfig({
     alias: {
       '@shared': path.resolve(__dirname, './src/shared'),
       '@scss': path.resolve(__dirname, './src/scss'),
+      '@styled': path.resolve(__dirname, './styled-system'),
       '@ui': path.resolve(__dirname, './src/ui'),
     },
   },

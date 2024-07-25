@@ -2,19 +2,18 @@ import {
   type Dispatch,
   type SetStateAction,
   useLayoutEffect,
+  useRef,
   useState,
 } from 'react';
 
-import { useMediaQuery } from '@shared/hooks/useMediaQueries';
-import { MotionBox } from '@ui/index';
+import { coord } from '@shared/helpers/grid';
+import { MotionBox } from '@ui/Motion';
 import { Popover } from '@ui/Popover';
-import { coord } from '../../helpers';
 import type { BoardState } from '../../services/BoardState';
 import type { CellState } from '../../services/CellState';
 import type { Coord, TokenState, Token as TokenType } from '../../types/board';
 import { CellAction } from '../CellActions';
 import { Token } from '../Token';
-import './token.scss';
 
 interface Props {
   board: BoardState;
@@ -33,42 +32,47 @@ export function ActiveToken({
   tokenState,
   setTokenState,
 }: Props) {
+  const timerRef = useRef<number>();
+  const ref = useRef<HTMLDivElement>(null);
   const { x, y } = cell;
   const coordinates = coord`${[x, y]}`;
   const [clientRect, setClientRect] =
     useState<Pick<DOMRect, 'left' | 'top' | 'width' | 'height'>>();
-  const isDesktop = useMediaQuery('(min-width: 768px)');
 
   useLayoutEffect(() => {
     const adjustLocation = () => {
       const boardCell = boardRef?.querySelector(`[data-key="${coordinates}"]`);
       const boardInner = boardCell?.querySelector('.inner');
-      if (boardCell && boardInner) {
-        const { left, top, width, height } = boardCell.getBoundingClientRect();
-        const parentElem =
-          boardCell instanceof HTMLElement && boardCell.offsetParent;
-        const { top: parentTop, left: parentLeft } = parentElem
-          ? parentElem.getBoundingClientRect()
-          : {
-              top: 0,
-              left: 0,
-            };
+
+      if (boardRef && boardInner && boardCell && ref.current) {
+        const { width, height, x, y } = boardCell.getBoundingClientRect();
+
+        const { top: scrollTop, left: scrollLeft } =
+          boardRef.getBoundingClientRect();
 
         setClientRect({
-          width: width - (isDesktop ? 2 : 1),
-          height: height - (isDesktop ? 2 : 1),
-          top: top + (isDesktop ? 1 : 0) + parentTop * -1,
-          left: left + (isDesktop ? 1 : 0) + parentLeft * -1,
+          width,
+          height,
+          top: y + scrollTop * -1, // top + (isDesktop ? 2 : 1) + parentTop * -1,
+          left: x + scrollLeft * -1, // left + (isDesktop ? 2 : 1) + parentLeft * -1,
         });
       }
     };
+    const scrollTimer = () => {
+      if (timerRef.current != null) {
+        clearTimeout(timerRef.current);
+      }
+      timerRef.current = setTimeout(adjustLocation, 150);
+    };
     adjustLocation();
+    window.addEventListener('scroll', scrollTimer, false);
     window.addEventListener('resize', adjustLocation);
 
     return () => {
       window.removeEventListener('resize', adjustLocation);
+      window.removeEventListener('scroll', scrollTimer);
     };
-  }, [coordinates, isDesktop, boardRef]);
+  }, [coordinates, boardRef]);
 
   return (
     <Popover
@@ -84,8 +88,10 @@ export function ActiveToken({
       }
     >
       <MotionBox
+        ref={ref}
         position="absolute"
-        p={isDesktop ? '1' : 'qtr'}
+        cursor="pointer"
+        p={{ base: '1.5', lg: '2.5' }}
         style={{
           left: clientRect?.left ?? 0,
           top: clientRect?.top ?? 0,
@@ -93,7 +99,11 @@ export function ActiveToken({
           height: clientRect?.height ?? 0,
         }}
       >
-        <Token token={token} />
+        <Token
+          top={{ base: '1px', md: '0.5' }}
+          left={{ base: '1px', md: '0.5' }}
+          token={token}
+        />
       </MotionBox>
     </Popover>
   );

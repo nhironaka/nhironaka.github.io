@@ -1,11 +1,4 @@
-import { type ConstValues } from '@shared/types';
-
-export const DIRECTIONS = {
-  LEFT: 'left',
-  TOP: 'top',
-  RIGHT: 'right',
-  BOTTOM: 'bottom',
-} as const;
+import { type ConstValues } from '@shared/types/utils';
 
 export const DIFFICULTY_TYPES = {
   EASY: 'easy',

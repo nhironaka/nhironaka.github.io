@@ -6,13 +6,14 @@ import {
 } from '@heroicons/react/24/solid';
 import type { Dispatch, SetStateAction } from 'react';
 
+import { DIRECTIONS } from '@shared/constants/ui';
+import type { Direction } from '@shared/types/ui';
+import { Box, Flex } from '@styled/jsx';
 import { Button } from '@ui/Button';
-import { Box, Flex, Text } from '@ui/index';
-import { DIRECTIONS } from '../../constants/board';
 import { allowedDirection } from '../../helpers/board';
 import type { BoardState } from '../../services/BoardState';
 import type { CellState } from '../../services/CellState';
-import type { Coord, Direction, Token } from '../../types/board';
+import type { Coord, Token } from '../../types/board';
 
 interface Props {
   coord: Coord;
@@ -36,11 +37,14 @@ export function CellAction({
       .filter(([direction, adjCell]) => {
         return allowedDirection(adjCell, direction);
       })
-      .reduce((acc, [direction]) => {
-        acc[direction] = true;
+      .reduce(
+        (acc, [direction]) => {
+          acc[direction] = true;
 
-        return acc;
-      }, {} as Record<Direction, boolean>);
+          return acc;
+        },
+        {} as Record<Direction, boolean>,
+      );
   };
   const allowedDirections = getAllowedDirections();
   const onClick = (direction: Direction) => {
@@ -52,30 +56,28 @@ export function CellAction({
   };
 
   return (
-    <Flex flexDirection="column">
-      <Box textAlign="center">
-        <Button
-          buttonStyle="text"
-          buttonSize="lg"
-          onClick={() => onClick(DIRECTIONS.TOP)}
-          disabled={!allowedDirections.top}
-        >
-          <Text color="board-focus" fontSize="lg">
-            <ArrowUpCircleIcon />
-          </Text>
-        </Button>
-      </Box>
+    <Flex flexDirection="column" alignItems="center" justifyContent="center">
+      <Button
+        buttonStyle="text"
+        buttonSize="lg"
+        onClick={() => onClick(DIRECTIONS.TOP)}
+        disabled={!allowedDirections.top}
+      >
+        <Box height="6" width="6" color="violet.600" fontSize="lg">
+          <ArrowUpCircleIcon />
+        </Box>
+      </Button>
 
-      <Flex gap="2">
+      <Flex gap="2" alignItems="center" justifyContent="center">
         <Button
           buttonStyle="text"
           buttonSize="lg"
           onClick={() => onClick(DIRECTIONS.LEFT)}
           disabled={!allowedDirections.left}
         >
-          <Text color="board-focus" fontSize="lg">
+          <Box height="6" width="6" color="violet.600" fontSize="lg">
             <ArrowLeftCircleIcon />
-          </Text>
+          </Box>
         </Button>
         <Button
           buttonStyle="text"
@@ -83,23 +85,21 @@ export function CellAction({
           onClick={() => onClick(DIRECTIONS.RIGHT)}
           disabled={!allowedDirections.right}
         >
-          <Text color="board-focus" fontSize="lg">
+          <Box height="6" width="6" color="violet.600" fontSize="lg">
             <ArrowRightCircleIcon />
-          </Text>
+          </Box>
         </Button>
       </Flex>
-      <Box textAlign="center">
-        <Button
-          buttonStyle="text"
-          buttonSize="lg"
-          onClick={() => onClick(DIRECTIONS.BOTTOM)}
-          disabled={!allowedDirections.bottom}
-        >
-          <Text color="board-focus" fontSize="lg">
-            <ArrowDownCircleIcon />
-          </Text>
-        </Button>
-      </Box>
+      <Button
+        buttonStyle="text"
+        buttonSize="lg"
+        onClick={() => onClick(DIRECTIONS.BOTTOM)}
+        disabled={!allowedDirections.bottom}
+      >
+        <Box height="6" width="6" color="violet.600" fontSize="lg">
+          <ArrowDownCircleIcon />
+        </Box>
+      </Button>
     </Flex>
   );
 }

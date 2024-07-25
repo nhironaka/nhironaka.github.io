@@ -4,71 +4,173 @@ import {
   useMergeRefs,
 } from '@floating-ui/react';
 import classNames from 'classnames';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { forwardRef, type HTMLProps } from 'react';
 
 import { TRANSLATE_MAP } from '@shared/constants/ui';
-import { usePopoverContext } from './context';
-import './popover.scss';
+import { type Direction } from '@shared/types/ui';
+import { styled } from '@styled/jsx';
+import { JsxStyleProps } from '@styled/types';
+import { MotionBox } from '@ui/Motion';
+import { usePopoverContext } from './hooks';
+
+const StyledPopoverContent = styled(MotionBox, {
+  base: {
+    bg: 'white',
+    p: '4',
+    borderRadius: 'md',
+    boxSizing: 'border-box',
+    width: 'max-content',
+    maxWidth: 'calc(100vw - 10px)',
+    boxShadow: 'lg',
+
+    _after: {
+      content: '',
+      position: 'absolute',
+      border: '1px solid',
+      borderColor: 'transparent',
+    },
+    _before: {
+      content: '',
+      position: 'absolute',
+      border: '1px solid',
+      borderColor: 'teal.600',
+    },
+  },
+  variants: {
+    arrowPlacement: {
+      top: {
+        _after: {
+          borderTopColor: 'white',
+          top: '100%',
+          marginTop: '-1px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+        },
+        _before: {
+          borderTopColor: 'teal.600',
+          top: '100%',
+          marginTop: '0',
+          left: '50%',
+          transform: 'translateX(-50%)',
+        },
+      },
+      right: {
+        _after: {
+          borderRightColor: 'white',
+          left: '100%',
+          marginLeft: '-1px',
+          top: '50%',
+          transform: 'translateY(-50%)',
+        },
+        _before: {
+          borderRightColor: 'teal.600',
+          left: '100%',
+          marginLeft: '0',
+          top: '50%',
+          transform: 'translateY(-50%)',
+        },
+      },
+      bottom: {
+        _after: {
+          borderBottomColor: 'white',
+          bottom: '100%',
+          marginBottom: '-1px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+        },
+        _before: {
+          borderBottomColor: 'teal.600',
+          bottom: '100%',
+          marginBottom: '0',
+          left: '50%',
+          transform: 'translateX(-50%)',
+        },
+      },
+      left: {
+        _after: {
+          borderLeftColor: 'white',
+          right: '100%',
+          marginRight: '-1px',
+          top: '50%',
+          transform: 'translateY(-50%)',
+        },
+        _before: {
+          borderLeftColor: 'teal.600',
+          right: '100%',
+          marginRight: '0',
+          top: '50%',
+          transform: 'translateY(-50%)',
+        },
+      },
+    },
+  },
+});
 
 export const PopoverContent = forwardRef<
   HTMLDivElement,
-  HTMLProps<HTMLDivElement>
->(({ style, className, children, ...props }, propRef) => {
+  HTMLProps<HTMLDivElement> & {
+    styleOverrides?: JsxStyleProps;
+  }
+>(({ style, className, children, styleOverrides, ...props }, propRef) => {
   const {
     context: floatingContext,
     refs,
     modal,
     open,
+    floatingStyles,
     getFloatingProps,
     strategy,
     placement: computedPlacement,
-    x,
-    y,
-    setOpen,
   } = usePopoverContext();
   const ref = useMergeRefs([refs.setFloating, propRef]);
 
-  const tooltipDirection = computedPlacement.includes('-')
-    ? computedPlacement.split('-')[0]
-    : computedPlacement;
+  const tooltipDirection = (
+    computedPlacement.includes('-')
+      ? computedPlacement.split('-')[0]
+      : computedPlacement
+  ) as Direction;
   const translate = TRANSLATE_MAP[tooltipDirection];
+  const mergedRefs = useMergeRefs([refs.setFloating, ref]);
+
+  if (!floatingContext.open) {
+    return null;
+  }
 
   return (
     <FloatingPortal>
       <FloatingFocusManager context={floatingContext} modal={modal}>
         <AnimatePresence>
-          {open && (
-            <motion.div
-              ref={ref}
-              initial={{ opacity: 0, ...translate }}
-              animate={{ opacity: 1, translateX: 0, translateY: 0 }}
-              exit={{ opacity: 0, ...translate }}
-              transition={{ duration: 0.2 }}
-              {...getFloatingProps({
-                ...props,
-                ref: refs.setFloating,
-                className: classNames('popover', tooltipDirection, className),
-                onMouseLeave() {
-                  setOpen(false);
-                },
-                style: {
-                  position: strategy,
-                  top: y ?? 0,
-                  left: x ?? 0,
-                  ...style,
-                },
-              })}
+          <StyledPopoverContent
+            className={classNames('popover', tooltipDirection, className)}
+            initial={open}
+            animate={open}
+            variants={{
+              true: { opacity: 1, translateX: 0, translateY: 0 },
+              false: { opacity: 0, ...translate },
+            }}
+            motionTransition={{ duration: 0.2 }}
+            arrowPlacement={tooltipDirection}
+            {...styleOverrides}
+            {...getFloatingProps({
+              ...props,
+              ref: mergedRefs,
+              style: {
+                ...style,
+                ...floatingStyles,
+                position: strategy,
+                minWidth: 120,
+              },
+            })}
+          >
+            <MotionBox
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
             >
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                {children}
-              </motion.div>
-            </motion.div>
-          )}
+              {children}
+            </MotionBox>
+          </StyledPopoverContent>
         </AnimatePresence>
       </FloatingFocusManager>
     </FloatingPortal>

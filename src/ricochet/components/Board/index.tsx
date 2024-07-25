@@ -6,10 +6,10 @@ import {
   useState,
 } from 'react';
 
-import { useMediaQuery } from '@shared/hooks/useMediaQueries';
-import { Box, Grid } from '@ui/index';
+import { coord } from '@shared/helpers/grid';
+import { Box, Flex, Grid } from '@styled/jsx';
+import { token } from '@styled/tokens';
 import { TOKENS } from '../../constants/board';
-import { coord } from '../../helpers';
 import { type BoardState } from '../../services/BoardState';
 import type { GoalState, Token, TokenState } from '../../types/board';
 import { ActiveToken } from '../ActiveToken';
@@ -34,9 +34,7 @@ export function Board({
   gridSize,
 }: Props) {
   const [rendered, setRendered] = useState(false);
-
   const boardRef = useRef<HTMLDivElement>(null);
-  const isDesktop = useMediaQuery('(min-width: 768px)');
 
   useLayoutEffect(() => {
     setRendered(true);
@@ -51,21 +49,24 @@ export function Board({
       overflow="auto"
       className="board"
     >
-      <Grid
-        bg="bg.focus"
-        borderRadius={isDesktop ? 'md' : 'sm'}
-        borderColor="bg.focus"
+      <Flex
+        flexDirection="column"
+        bg="amber.900"
+        borderRadius={{ base: 'sm', lg: 'md' }}
+        borderColor="amber.900"
         border="1px solid"
-        gap="px"
+        gap="1px"
         ref={boardRef}
       >
         {board.cells.map((columns, idx) => {
           return (
             <Grid
               key={idx}
-              gap="px"
-              borderRadius={isDesktop ? 'md' : 'sm'}
-              gridTemplateColumns={`${gridSize}-1`}
+              gap="1px"
+              borderRadius={{ base: 'sm', lg: 'md' }}
+              style={{
+                gridTemplateColumns: `repeat(${gridSize}, minMax(${token('spacing.1')}, 1fr))`,
+              }}
             >
               {columns.map((cell) => {
                 const xy = coord`${[cell.x, cell.y]}`;
@@ -83,7 +84,7 @@ export function Board({
             </Grid>
           );
         })}
-      </Grid>
+      </Flex>
       {rendered &&
         Object.values(TOKENS).map((token) => {
           const coordinates = coord`${tokenState[token]}`;

@@ -1,5 +1,3 @@
-import { Box } from '@components/ui';
-import { TooltipGroupContext } from '@components/ui/Tooltip/context';
 import {
   FloatingPortal,
   type Placement,
@@ -8,7 +6,6 @@ import {
   offset,
   shift,
   useDelayGroup,
-  useDelayGroupContext,
   useDismiss,
   useFloating,
   useFocus,
@@ -16,8 +13,7 @@ import {
   useInteractions,
   useRole,
 } from '@floating-ui/react';
-import { TRANSLATE_MAP } from '@shared/constants/ui';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import {
   type ReactNode,
   cloneElement,
@@ -26,7 +22,12 @@ import {
   useLayoutEffect,
   useState,
 } from 'react';
-import './tooltip.scss';
+
+import { TRANSLATE_MAP } from '@shared/constants/ui';
+import { type Direction } from '@shared/types/ui';
+import { Box } from '@styled/jsx';
+import { MotionBox } from '@ui/Motion';
+import { TooltipGroupContext } from './context';
 
 interface Props {
   content: ReactNode;
@@ -45,14 +46,9 @@ export const Tooltip = ({
 }: Props) => {
   const { placement: groupPlacement, groupId } =
     useContext(TooltipGroupContext);
-  const { delay, isInstantPhase } = useDelayGroupContext();
-  const showDelayFinal =
-    showDelay ?? (typeof delay === 'number' ? delay : delay.open) ?? 500;
-  const hideDelayFinal =
-    hideDelay ?? (typeof delay === 'number' ? delay : delay.close) ?? 200;
-  const placementFinal = placement || groupPlacement;
-  const [open, setOpen] = useState(true);
 
+  const tooltipId = useId();
+  const [open, setOpen] = useState(true);
   // unmounted -> initial -> positioned -> unmounted
   const [state, setState] = useState<'unmounted' | 'initial' | 'positioned'>(
     'unmounted',
@@ -66,7 +62,7 @@ export const Tooltip = ({
     isPositioned,
     placement: computedPlacement,
   } = useFloating({
-    placement: placementFinal,
+    placement: placement || groupPlacement,
     open,
     onOpenChange(open) {
       setOpen(open);
@@ -78,6 +74,12 @@ export const Tooltip = ({
     middleware: [offset(5), flip(), shift({ padding: 8 })],
     whileElementsMounted: autoUpdate,
   });
+  const { delay, isInstantPhase } = useDelayGroup(context, { id: tooltipId });
+
+  const showDelayFinal =
+    showDelay ?? (typeof delay === 'number' ? delay : delay.open) ?? 500;
+  const hideDelayFinal =
+    hideDelay ?? (typeof delay === 'number' ? delay : delay.close) ?? 200;
 
   const { getReferenceProps, getFloatingProps } = useInteractions([
     useHover(context, { delay: showDelayFinal, restMs: hideDelayFinal }),
@@ -86,21 +88,19 @@ export const Tooltip = ({
     useDismiss(context),
   ]);
 
-  const tooltipId = useId();
-  useDelayGroup(context, { id: tooltipId });
-
   useLayoutEffect(() => {
     if (isPositioned && state !== 'positioned') {
       setState('positioned');
     }
-  }, [isPositioned]);
+  }, [isPositioned, state]);
 
-  const translate =
-    TRANSLATE_MAP[
-      computedPlacement.includes('-')
-        ? computedPlacement.split('-')[0]
-        : computedPlacement
-    ];
+  const direction = (
+    computedPlacement.includes('-')
+      ? computedPlacement.split('-')[0]
+      : computedPlacement
+  ) as Direction;
+
+  const translate = TRANSLATE_MAP[direction];
 
   return (
     <>
@@ -116,6 +116,12 @@ export const Tooltip = ({
         {/* This element used to measure its size for position calculation, and later we render true tooltip */}
         {open && state === 'initial' && (
           <Box
+            color="white"
+            borderRadius="sm"
+            width="max-content"
+            maxWidth="calc(100vw - 10px)"
+            px="1"
+            py="2"
             {...getFloatingProps({
               ref: context.refs.setFloating,
               className: 'Tooltip',
@@ -136,11 +142,11 @@ export const Tooltip = ({
           }}
         >
           {open && state === 'positioned' && (
-            <motion.div
+            <MotionBox
               initial={isInstantPhase ? {} : { opacity: 0, ...translate }}
               animate={{ opacity: 1, translateX: 0, translateY: 0 }}
               exit={{ opacity: 0, ...translate }}
-              transition={{ duration: 0.2 }}
+              motionTransition={{ duration: 0.2 }}
               layoutId={groupId}
               {...getFloatingProps({
                 ref: context.refs.setFloating,
@@ -152,14 +158,14 @@ export const Tooltip = ({
                 },
               })}
             >
-              <motion.div
+              <MotionBox
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
                 {content}
-              </motion.div>
-            </motion.div>
+              </MotionBox>
+            </MotionBox>
           )}
         </AnimatePresence>
       </FloatingPortal>

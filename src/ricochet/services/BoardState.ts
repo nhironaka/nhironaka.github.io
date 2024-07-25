@@ -1,13 +1,14 @@
+import { DIRECTIONS } from '@shared/constants/ui';
+import { coord, generateMatrix } from '@shared/helpers/grid';
+import type { Direction } from '@shared/types/ui';
 import {
   DIFFICULTY_CONFIGS,
   DIFFICULTY_TYPES,
-  DIRECTIONS,
   WALL_CONFIGS,
 } from '../constants/board';
-import { coord, fromCoord } from '../helpers';
+import { fromCoord } from '../helpers';
 import {
   allowedDirection,
-  generateMatrix,
   getBoardCenter,
   getInitialTokenState,
   getRandomDifficulty,
@@ -15,7 +16,7 @@ import {
   isBoardEdge,
   stoppedByCell,
 } from '../helpers/board';
-import type { Coord, Difficulty, Direction, Token } from '../types/board';
+import type { Coord, Difficulty, Token } from '../types/board';
 import { CellState } from './CellState';
 import { Randomizer } from './randomizer';
 
@@ -35,7 +36,7 @@ export class BoardState {
 
   constructor(
     gridSize = DEFAULT_GRID_COUNT,
-    difficulty: Difficulty = DIFFICULTY_TYPES.EASY
+    difficulty: Difficulty = DIFFICULTY_TYPES.EASY,
   ) {
     this.configedCells = {};
     this.difficulty = difficulty;
@@ -48,16 +49,16 @@ export class BoardState {
     const difficultyConfig = { ...DIFFICULTY_CONFIGS[this.difficulty] };
     const numConfiguredCells = Object.values(difficultyConfig).reduce(
       (acc, val) => acc + val,
-      0
+      0,
     );
     const initialTokenState = getInitialTokenState(gridSize);
     const startingPositions = Object.values(initialTokenState).map(
-      (xy) => coord`${xy}`
+      (xy) => coord`${xy}`,
     );
     const surroundingCells = getSurroundingCells(boardCenter, gridSize);
     const flatBoard = generateMatrix(
       gridSize,
-      (row, column) => coord`${[row, column]}`
+      (row, column) => coord`${[row, column]}`,
     )
       .flat()
       .filter((xy) => {
@@ -81,8 +82,8 @@ export class BoardState {
       const wallConfig = isCenter
         ? WALL_CONFIGS.ALL
         : isConfigured
-        ? getRandomDifficulty(difficultyConfig)
-        : WALL_CONFIGS.NONE;
+          ? getRandomDifficulty(difficultyConfig)
+          : WALL_CONFIGS.NONE;
 
       const cell = new CellState({
         x: row,
@@ -123,17 +124,20 @@ export class BoardState {
       [DIRECTIONS.RIGHT]: [x + rightX, y + rightY],
     })
       .filter(([_, coord]) => this.inBounds(coord as Coord))
-      .reduce((acc, [direction, [row, column]]) => {
-        acc[direction as Direction] = this.cells[row][column];
+      .reduce(
+        (acc, [direction, [row, column]]) => {
+          acc[direction as Direction] = this.cells[row][column];
 
-        return acc;
-      }, {} as Record<Direction, CellState>);
+          return acc;
+        },
+        {} as Record<Direction, CellState>,
+      );
   }
 
   getBlockingCoord(
     xy: Coord,
     direction: Direction,
-    tokenState: Record<Token, Coord>
+    tokenState: Record<Token, Coord>,
   ): Coord {
     const [x, y] = xy;
     const { x: x1, y: y1 } = TO_DIRECTION[direction];

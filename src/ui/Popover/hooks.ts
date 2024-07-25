@@ -1,16 +1,19 @@
 import {
   autoUpdate,
   flip,
-  offset,
   type Placement,
   shift,
   useClick,
   useDismiss,
   useFloating,
+  UseFloatingReturn,
   useInteractions,
+  UseInteractionsReturn,
   useRole,
 } from '@floating-ui/react';
-import { useMemo, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
+
+import { PopoverContext, PopoverContextType } from './context';
 
 export interface PopoverOptions {
   initialOpen?: boolean;
@@ -20,13 +23,19 @@ export interface PopoverOptions {
   onOpenChange?: (open: boolean) => void;
 }
 
+interface ReturnValue extends UseInteractionsReturn, UseFloatingReturn {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  modal?: boolean;
+}
+
 export function usePopover({
   initialOpen = false,
   placement = 'top',
   modal,
   open: controlledOpen,
   onOpenChange: setControlledOpen,
-}: PopoverOptions = {}) {
+}: PopoverOptions = {}): ReturnValue {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(initialOpen);
 
   const open = controlledOpen ?? uncontrolledOpen;
@@ -35,10 +44,11 @@ export function usePopover({
   const data = useFloating({
     placement,
     open,
-    onOpenChange: setOpen,
+    onOpenChange: (open) => {
+      setOpen(open);
+    },
     whileElementsMounted: autoUpdate,
     middleware: [
-      offset(8),
       flip({
         crossAxis: placement.includes('-'),
         fallbackAxisSideDirection: 'end',
@@ -47,8 +57,7 @@ export function usePopover({
       shift({ padding: 16 }),
     ],
   });
-
-  const context = data.context;
+  const { context } = data;
 
   const click = useClick(context, {
     enabled: controlledOpen == null,
@@ -69,3 +78,13 @@ export function usePopover({
     [open, setOpen, interactions, data, modal],
   );
 }
+
+export const usePopoverContext = (): NonNullable<PopoverContextType> => {
+  const context = useContext(PopoverContext);
+
+  if (context == null) {
+    throw new Error('Popover components must be wrapped in <Popover />');
+  }
+
+  return context;
+};

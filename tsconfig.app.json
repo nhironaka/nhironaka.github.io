@@ -26,8 +26,9 @@
     "paths": {
       "@scss/*": ["./src/scss/*"],
       "@shared/*": ["./src/shared/*"],
+      "@styled/*": ["./styled-system/*"],
       "@ui/*": ["./src/ui/*"]
     }
   },
-  "include": ["src"]
+  "include": ["./src", "./styled-system"]
 }

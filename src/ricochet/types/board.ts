@@ -1,14 +1,11 @@
 import { type ConstValues } from '../../shared/types/utils';
 import {
   type DIFFICULTY_TYPES,
-  type DIRECTIONS,
   type GOAL_TOKENS,
   type PLAYERS,
   type TOKENS,
   type WALL_CONFIGS,
 } from '../constants/board';
-
-export type Direction = ConstValues<typeof DIRECTIONS>;
 
 export type Token = ConstValues<typeof TOKENS>;
 

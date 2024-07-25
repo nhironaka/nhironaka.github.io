@@ -1,31 +1,27 @@
 import { forwardRef } from 'react';
 
-import { useMediaQuery } from '@shared/hooks/useMediaQueries';
-import type { ComponentAttributes } from '@shared/types/utils';
-import { Box } from '@ui/index';
+import { Box } from '@styled/jsx';
+import { type MotionBoxProps, MotionBox } from '@ui/Motion';
 
-export const Square = forwardRef<
-  HTMLDivElement,
-  ComponentAttributes<HTMLDivElement>
->(({ children, ...rest }, ref) => {
-  const isDesktop = useMediaQuery('(min-width: 768px)');
+export const Square = forwardRef<HTMLDivElement, MotionBoxProps>(
+  ({ children, ...rest }, ref) => {
+    return (
+      <MotionBox width="full" position="relative" {...rest} ref={ref}>
+        <Box mt="100%" />
 
-  return (
-    <Box width="full" position="relative" className="cell" {...rest} ref={ref}>
-      <Box mt="full" />
-
-      <Box
-        width="full"
-        height="full"
-        top="0"
-        left="0"
-        borderRadius={isDesktop ? 'md' : 'sm'}
-        position="absolute"
-      >
-        {children}
-      </Box>
-    </Box>
-  );
-});
+        <Box
+          width="full"
+          height="full"
+          top="0"
+          left="0"
+          borderRadius={{ base: 'sm', lg: 'md' }}
+          position="absolute"
+        >
+          {children}
+        </Box>
+      </MotionBox>
+    );
+  },
+);
 
 Square.displayName = 'Square';

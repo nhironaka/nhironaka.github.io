@@ -1,6 +1,6 @@
-import { useMediaQuery } from '@shared/hooks/useMediaQueries';
+import { Flex } from '@styled/jsx';
 import { Button } from '@ui/Button';
-import { Divider, Flex, Text } from '@ui/index';
+import { Divider, Text } from '@ui/index';
 import { PLAYERS } from '../../constants/board';
 import type { Player } from '../../types/board';
 
@@ -21,16 +21,13 @@ export function Controller({
   activePlayer,
   numMoves,
 }: Props) {
-  const isDesktop = useMediaQuery('(min-width: 768px)');
-
   return (
     <Flex
       flexDirection="column"
       justifyContent="space-between"
       gap="2"
-      px={isDesktop ? '6' : '2'}
+      px={{ base: '2', lg: '6' }}
       width="full"
-      cursor="pointer"
       className="controller"
     >
       <Flex

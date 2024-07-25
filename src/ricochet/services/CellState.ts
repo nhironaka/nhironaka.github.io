@@ -1,8 +1,10 @@
+import { DIRECTIONS } from '@shared/constants/ui';
 import { assertNever } from '@shared/helpers';
-import { DIRECTIONS, WALL_CONFIGS } from '../constants/board';
+import { type Direction } from '@shared/types/ui';
+import { WALL_CONFIGS } from '../constants/board';
 import { getRandomInt } from '../helpers';
 import { isBoardEdge } from '../helpers/board';
-import { type Direction, type WallConfig } from '../types/board';
+import { type WallConfig } from '../types/board';
 
 export type WallState = Partial<Record<Direction, boolean>>;
 
@@ -51,7 +53,7 @@ export class CellState {
     if (edges?.length) {
       wallState = edges.reduce(
         (acc, side) => ({ ...acc, [side]: true }),
-        wallState
+        wallState,
       );
       isEdge = true;
     }

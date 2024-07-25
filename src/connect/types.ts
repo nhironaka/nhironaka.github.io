@@ -1,4 +1,4 @@
-import { type ConstValues } from '@shared/types';
-import { type colors } from 'src/connect/constants';
+import { type ConstValues } from '@shared/types/utils';
+import { type colors } from './constants';
 
 export type Color = ConstValues<typeof colors>;

@@ -1,16 +1,13 @@
+import { DIRECTIONS } from '@shared/constants/ui';
 import { assertNever } from '@shared/helpers';
-import { coord, fromCoord } from '.';
-import {
-  DIRECTIONS,
-  GOAL_TOKENS,
-  TOKENS,
-  WALL_CONFIGS,
-} from '../constants/board';
+import { coord } from '@shared/helpers/grid';
+import type { Direction } from '@shared/types/ui';
+import { fromCoord } from '.';
+import { GOAL_TOKENS, TOKENS, WALL_CONFIGS } from '../constants/board';
 import type { BoardState } from '../services/BoardState';
 import type { CellState } from '../services/CellState';
 import { Randomizer } from '../services/randomizer';
 import type {
-  Direction,
   GoalState,
   GoalToken,
   Token,
@@ -33,17 +30,6 @@ export const getBoardCenter = (gridSize: number) => {
   }
 };
 
-export const generateMatrix = <T>(
-  gridSize: number,
-  output: (row: number, column: number) => T
-) => {
-  return new Array(gridSize).fill('').map((_, row) => {
-    return new Array(gridSize).fill('').map((_, column) => {
-      return output(row, column);
-    });
-  });
-};
-
 export const getSurroundingCells = (grid: string[], gridSize: number) => {
   const {
     x: { minX, maxX },
@@ -64,7 +50,7 @@ export const getSurroundingCells = (grid: string[], gridSize: number) => {
     {
       x: { maxX: 0, minX: gridSize - 1 },
       y: { maxY: 0, minY: gridSize - 1 },
-    }
+    },
   );
 
   const surroundingCells: Array<string> = [];
@@ -122,7 +108,7 @@ export const isBoardCenter = (opt: {
 };
 
 export const getRandomDifficulty = (
-  difficultyConfig: Partial<Record<WallConfig, number>>
+  difficultyConfig: Partial<Record<WallConfig, number>>,
 ) => {
   let wallConfig =
     Math.random() < 0.5 ? WALL_CONFIGS.SINGLE : WALL_CONFIGS.CORNER;
@@ -234,7 +220,7 @@ export const getInitialTokenState = (gridSize: number) => {
 export const getGoalState = (board: BoardState) => {
   const { configedCells } = board;
   const cornerWallCells = Object.values(configedCells).filter(
-    ({ wallConfig }) => wallConfig === WALL_CONFIGS.CORNER
+    ({ wallConfig }) => wallConfig === WALL_CONFIGS.CORNER,
   );
   const cornerWallCoord = cornerWallCells.map(({ x, y }) => coord`${[x, y]}`);
   const goalTokens = Object.values(GOAL_TOKENS);
@@ -260,7 +246,7 @@ export const isAtGoal = (opt: {
   const goalTokenColor = activeGoal.replace(/\d+/, '') as Token;
 
   const tokenCoord = Object.entries(tokenState).find(
-    ([_, token]) => goalTokenColor === token
+    ([_, token]) => goalTokenColor === token,
   )?.[0];
 
   return goalCoord === tokenCoord;

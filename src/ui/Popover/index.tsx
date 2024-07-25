@@ -1,30 +1,31 @@
-import { type HTMLProps, type ReactElement } from 'react';
+import { type ReactElement } from 'react';
 
+import { JsxStyleProps } from '@styled/types';
 import { PopoverContext } from './context';
 import { type PopoverOptions, usePopover } from './hooks';
 import { PopoverContent } from './PopoverContent';
 import { PopoverTrigger } from './PopoverTrigger';
+
+interface Props extends PopoverOptions {
+  children: ReactElement;
+  popoverContent: ReactElement;
+  className?: string;
+  styleOverrides?: JsxStyleProps;
+}
 
 export function Popover({
   children,
   popoverContent,
   modal = false,
   className,
-  style,
+  styleOverrides,
   ...restOptions
-}: {
-  children: ReactElement;
-  popoverContent: ReactElement;
-  className?: string;
-  style?: HTMLProps<HTMLDivElement>['style'];
-} & PopoverOptions) {
-  // This can accept any props as options, e.g. `placement`,
-  // or other positioning options.
+}: Props) {
   const popover = usePopover({ modal, ...restOptions });
   return (
     <PopoverContext.Provider value={popover}>
       <PopoverTrigger>{children}</PopoverTrigger>
-      <PopoverContent className={className} style={style}>
+      <PopoverContent className={className} styleOverrides={styleOverrides}>
         {popoverContent}
       </PopoverContent>
     </PopoverContext.Provider>
