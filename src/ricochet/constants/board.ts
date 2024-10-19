@@ -60,8 +60,3 @@ export const DIFFICULTY_CONFIGS = {
     [WALL_CONFIGS.CORNER]: 16,
   },
 };
-
-export const PLAYERS = {
-  ONE: 1,
-  TWO: 2,
-} as const;

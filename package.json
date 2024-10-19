@@ -1,16 +1,17 @@
 {
-  "name": "kjdwz9x3mb-2",
+  "name": "nhironaka",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://nhironaka.github.io/kjDWz9X3MB",
+  "homepage": "https://nhironaka.github.io",
   "scripts": {
     "prepare": "panda codegen",
+    "debug": "panda debug",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.6.11",
@@ -37,7 +38,7 @@
     "eslint-plugin-promise": "^7.1.0",
     "eslint-plugin-react": "^7.37.1",
     "eslint-plugin-react-refresh": "^0.4.12",
-    "gh-pages": "^6.1.1",
+    "gh-pages": "^6.2.0",
     "prettier": "^3.3.3",
     "sass": "^1.79.4",
     "typescript": "^5.6.2",

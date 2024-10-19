@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 
 import { Box } from '@styled/jsx';
-import { type MotionBoxProps, MotionBox } from '@ui/Motion';
+import { MotionBox, type MotionBoxProps } from '@ui/Motion';
 
 export const Square = forwardRef<HTMLDivElement, MotionBoxProps>(
   ({ children, ...rest }, ref) => {
