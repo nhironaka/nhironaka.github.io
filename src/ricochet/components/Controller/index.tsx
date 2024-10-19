@@ -1,8 +1,8 @@
+import { PLAYERS } from '@shared/constants';
+import type { Player } from '@shared/types';
 import { Flex } from '@styled/jsx';
 import { Button } from '@ui/Button';
 import { Divider, Text } from '@ui/index';
-import { PLAYERS } from '../../constants/board';
-import type { Player } from '../../types/board';
 
 interface Props {
   numMoves: number;

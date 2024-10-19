@@ -42,9 +42,8 @@ export function ActiveToken({
   useLayoutEffect(() => {
     const adjustLocation = () => {
       const boardCell = boardRef?.querySelector(`[data-key="${coordinates}"]`);
-      const boardInner = boardCell?.querySelector('.inner');
 
-      if (boardRef && boardInner && boardCell && ref.current) {
+      if (boardRef && boardCell) {
         const { width, height, x, y } = boardCell.getBoundingClientRect();
 
         const { top: scrollTop, left: scrollLeft } =
@@ -53,8 +52,8 @@ export function ActiveToken({
         setClientRect({
           width,
           height,
-          top: y + scrollTop * -1, // top + (isDesktop ? 2 : 1) + parentTop * -1,
-          left: x + scrollLeft * -1, // left + (isDesktop ? 2 : 1) + parentLeft * -1,
+          top: y + scrollTop * -1,
+          left: x + scrollLeft * -1,
         });
       }
     };
