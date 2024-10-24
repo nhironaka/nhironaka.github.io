@@ -1,10 +1,11 @@
 import { Dispatch, SetStateAction, useRef, useState } from 'react';
 
 import { coord } from '@shared/helpers/grid';
-import { cva, RecipeVariantProps } from '@styled/css';
+import { cva } from '@styled/css';
 import { Box, Circle, Flex, Grid } from '@styled/jsx';
 import { token as pandaToken } from '@styled/tokens';
 import { MotionBox } from '@ui/Motion';
+import classNames from 'classnames';
 import { BOARD_SIZE, TOKENS } from '../constants';
 import { BoardState } from '../services/BoardState';
 import { Token } from '../types';
@@ -21,26 +22,55 @@ const DROP_ROW = new Array<string>(BOARD_SIZE).fill('');
 
 const borderRadiusRecipe = cva({
   variants: {
-    coord: {
-      '0, 0': {
+    top: {
+      true: {},
+      false: {},
+    },
+    left: {
+      true: {},
+      false: {},
+    },
+    bottom: {
+      true: {},
+      false: {},
+    },
+    right: {
+      true: {},
+      false: {},
+    },
+  },
+
+  compoundVariants: [
+    {
+      top: true,
+      left: true,
+      css: {
         borderTopLeftRadius: { base: 'sm', lg: 'md' },
       },
-      '6, 0': {
+    },
+    {
+      top: true,
+      right: true,
+      css: {
         borderTopRightRadius: { base: 'sm', lg: 'md' },
       },
-      '0, 6': {
-        borderBottomLefttRadius: { base: 'sm', lg: 'md' },
+    },
+    {
+      bottom: true,
+      left: true,
+      css: {
+        borderBottomLeftRadius: { base: 'sm', lg: 'md' },
       },
-      '6, 6': {
+    },
+    {
+      bottom: true,
+      right: true,
+      css: {
         borderBottomRightRadius: { base: 'sm', lg: 'md' },
       },
     },
-  },
+  ],
 });
-
-type CornerCoord = NonNullable<
-  RecipeVariantProps<typeof borderRadiusRecipe>
->['coord'];
 
 export function Board({ board, activePlayer, setActivePlayer }: Props) {
   const { tokenState } = board;
@@ -149,7 +179,14 @@ export function Board({ board, activePlayer, setActivePlayer }: Props) {
               position="relative"
               flexDirection="column"
               bg="white"
-              borderRadius={{ base: 'sm', lg: 'md' }}
+              className={classNames(
+                borderRadiusRecipe({
+                  top: true,
+                  bottom: true,
+                  left: col === 0,
+                  right: col === BOARD_SIZE - 1,
+                }),
+              )}
             >
               {activeToken?.x === col && (
                 <MotionBox
@@ -173,14 +210,19 @@ export function Board({ board, activePlayer, setActivePlayer }: Props) {
               {row.map((cell) => {
                 const xy = coord`${[cell.x, cell.y]}`;
                 const token = tokenState[xy];
+                const className = borderRadiusRecipe({
+                  top: cell.y === 0,
+                  bottom: cell.y === BOARD_SIZE - 1,
+                  left: cell.x === 0,
+                  right: cell.x === BOARD_SIZE - 1,
+                });
+
                 if (token) {
                   return (
                     <Cell
                       bg="sky.100"
                       key={xy}
-                      className={borderRadiusRecipe({
-                        coord: xy as CornerCoord,
-                      })}
+                      className={className}
                       token={tokenState[xy]}
                       x={cell.x}
                       y={cell.y}
@@ -192,9 +234,7 @@ export function Board({ board, activePlayer, setActivePlayer }: Props) {
                 return (
                   <EmptyCell
                     key={xy}
-                    className={borderRadiusRecipe({
-                      coord: xy as CornerCoord,
-                    })}
+                    className={className}
                     x={cell.x}
                     y={cell.y}
                     foreground={pandaToken('colors.sky.100')}

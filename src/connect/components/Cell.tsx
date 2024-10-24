@@ -36,7 +36,6 @@ export function Cell({ x, y, token, ...rest }: Props) {
       })}
       width="full"
       height="full"
-      borderRadius={{ base: 'sm', lg: 'md' }}
       {...rest}
     >
       <Circle
