@@ -146,7 +146,7 @@ export const Tooltip = ({
               initial={isInstantPhase ? {} : { opacity: 0, ...translate }}
               animate={{ opacity: 1, translateX: 0, translateY: 0 }}
               exit={{ opacity: 0, ...translate }}
-              motionTransition={{ duration: 0.2 }}
+              transition={{ duration: 0.2 }}
               layoutId={groupId}
               {...getFloatingProps({
                 ref: context.refs.setFloating,

@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 import App from './App.tsx';
+import { Game as AzulGame } from './azul';
 import { Game as ConnectGame } from './connect';
 import { Game as RicochetGame } from './ricochet';
 
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
       {
         path: '/ricochet-robot',
         element: <RicochetGame />,
+      },
+      {
+        path: '/azul',
+        element: <AzulGame />,
       },
     ],
   },

@@ -1,6 +1,7 @@
 import { DIRECTIONS } from '@shared/constants/ui';
 import { coord, generateMatrix } from '@shared/helpers/grid';
 import type { Direction } from '@shared/types/ui';
+import { Randomizer } from '../../shared/services/randomizer';
 import {
   DIFFICULTY_CONFIGS,
   DIFFICULTY_TYPES,
@@ -18,7 +19,6 @@ import {
 } from '../helpers/board';
 import type { Coord, Difficulty, Token } from '../types/board';
 import { CellState } from './CellState';
-import { Randomizer } from './randomizer';
 
 export const DEFAULT_GRID_COUNT = 20;
 

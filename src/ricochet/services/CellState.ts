@@ -1,8 +1,8 @@
 import { DIRECTIONS } from '@shared/constants/ui';
-import { assertNever } from '@shared/helpers';
+import { assertNever, getRandomInt } from '@shared/helpers';
 import { type Direction } from '@shared/types/ui';
+import random from 'random';
 import { WALL_CONFIGS } from '../constants/board';
-import { getRandomInt } from '../helpers';
 import { isBoardEdge } from '../helpers/board';
 import { type WallConfig } from '../types/board';
 
@@ -13,12 +13,12 @@ const getRandomSide = () => getRandomInt(sides.length);
 
 const getAdjacentSide = (idx: number) => {
   if (idx === 0) {
-    return Math.random() < 0.5 ? idx + 1 : sides.length - 1;
+    return random.bool() ? idx + 1 : sides.length - 1;
   }
   if (idx === sides.length - 1) {
-    return Math.random() < 0.5 ? idx - 1 : 0;
+    return random.bool() ? idx - 1 : 0;
   }
-  const incr = Math.random() < 0.5 ? 1 : -1;
+  const incr = random.bool() ? 1 : -1;
 
   return idx + incr;
 };

@@ -4,13 +4,13 @@ import { PLAYERS } from '@shared/constants';
 import { coord } from '@shared/helpers/grid';
 import { type Player } from '@shared/types';
 import { Button } from '@ui/Button';
+import { Randomizer } from '../shared/services/randomizer';
 import { Board } from './components/Board';
 import { Controller } from './components/Controller';
 import { NextPlay } from './components/NextPlay';
 import { DIFFICULTY_TYPES, GOAL_TOKENS } from './constants/board';
 import { getGoalState, getInitialTokenState, isAtGoal } from './helpers/board';
 import { BoardState, DEFAULT_GRID_COUNT } from './services/BoardState';
-import { Randomizer } from './services/randomizer';
 import {
   type Difficulty,
   type GoalState,

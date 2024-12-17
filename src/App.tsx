@@ -1,9 +1,26 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
 import { INDEX } from '@shared/constants';
+import { css } from '@styled/css';
 import { Box, Flex } from '@styled/jsx';
 import { buttonRecipe } from '@ui/Button';
 import { Li, Ul } from '@ui/index';
+import classNames from 'classnames';
+
+const menu = [
+  {
+    label: 'Azul',
+    path: 'azul',
+  },
+  {
+    label: 'Connect 4',
+    path: 'connect-4',
+  },
+  {
+    label: 'Richochet robot',
+    path: 'ricochet-robot',
+  },
+];
 
 export default function App() {
   const location = useLocation();
@@ -17,53 +34,54 @@ export default function App() {
         width="full"
         height="full"
         p="4"
+        bg="ivory"
+        overflow="auto"
       >
         <Ul>
-          <Li
-            cursor="pointer"
-            color="blue.700"
-            _hover={{
-              textDecoration: 'underline',
-            }}
-          >
-            <Link to="connect-4">Connect 4</Link>
-          </Li>
-          <Li
-            cursor="pointer"
-            color="blue.700"
-            _hover={{
-              textDecoration: 'underline',
-            }}
-          >
-            <Link to="ricochet-robot">Ricochet robot</Link>
-          </Li>
+          {menu.map(({ label, path }) => (
+            <Li
+              cursor="pointer"
+              key={path}
+              color="blue.700"
+              _hover={{
+                textDecoration: 'underline',
+              }}
+            >
+              <Link to={path}>{label}</Link>
+            </Li>
+          ))}
         </Ul>
       </Flex>
     );
   }
   return (
-    <Flex
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="space-between"
-      width="full"
-      height="full"
-      py="4"
-    >
-      <Box width="full">
-        <Outlet />
-      </Box>
-      <Box>
+    <Flex width="full" height="full" bg="ivory">
+      <Box
+        width="full"
+        height="full"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="space-between"
+        position="relative"
+      >
         <Link
-          className={buttonRecipe({
-            buttonSize: 'sm',
-            buttonStyle: 'text',
-            buttonTheme: 'primary',
-          })}
+          className={classNames(
+            buttonRecipe({
+              buttonSize: 'sm',
+              buttonStyle: 'text',
+              buttonTheme: 'primary',
+            }),
+            css({
+              left: 4,
+              top: 4,
+              position: 'absolute',
+            }),
+          )}
           to="/"
         >
           Back
         </Link>
+        <Outlet />
       </Box>
     </Flex>
   );

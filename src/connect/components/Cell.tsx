@@ -1,12 +1,10 @@
 import { coord } from '@shared/helpers/grid';
 import { cva } from '@styled/css';
 import { Circle } from '@styled/jsx';
-import { ComponentProps } from '@styled/types';
-import { Square } from '@ui/Square';
+import { Square, SquareProps } from '@ui/Motion';
 import { Token } from '../types';
 
-interface Props
-  extends Omit<ComponentProps<typeof Square>, 'x' | 'y' | 'children'> {
+interface Props extends Omit<SquareProps, 'x' | 'y' | 'children'> {
   x: number;
   y: number;
   token: Token;

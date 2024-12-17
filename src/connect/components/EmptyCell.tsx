@@ -1,11 +1,9 @@
 import { motion } from 'framer-motion';
 
 import { coord } from '@shared/helpers/grid';
-import { ComponentProps } from '@styled/types';
-import { Square } from '@ui/Square';
+import { Square, SquareProps } from '@ui/Motion';
 
-interface Props
-  extends Omit<ComponentProps<typeof Square>, 'x' | 'y' | 'children'> {
+interface Props extends Omit<SquareProps, 'x' | 'y' | 'children'> {
   x: number;
   y: number;
   foreground: string;

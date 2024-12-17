@@ -1,42 +1,20 @@
-import { type HTMLMotionProps, motion } from 'framer-motion';
-import { forwardRef, ReactNode } from 'react';
+import { motion } from 'framer-motion';
+import { ComponentProps, ReactNode } from 'react';
 
-import { css } from '@styled/css';
-import { splitCssProps, styled } from '@styled/jsx';
-import { type ComponentProps } from '@styled/types';
-import classNames from 'classnames';
+import { Box, Square as StyledSquare } from '@styled/jsx';
 
-const Div = styled(motion.div);
+export const MotionBox = motion.create(Box, {
+  forwardMotionProps: true,
+});
 
-interface Props
-  extends Omit<
-      HTMLMotionProps<'div'>,
-      'color' | 'content' | 'transition' | 'translate'
-    >,
-    Omit<ComponentProps<typeof Div>, 'transition' | 'translate' | 'children'> {
-  motionTransition?: HTMLMotionProps<'div'>['transition'];
-  motionTranslate?: HTMLMotionProps<'div'>['translate'];
-  children?: ReactNode;
+export interface MotionBoxProps
+  extends Omit<ComponentProps<typeof MotionBox>, 'children'> {
+  children: ReactNode;
 }
 
-export type { Props as MotionBoxProps };
+export const Square = motion.create(StyledSquare, { forwardMotionProps: true });
 
-export const MotionBox = forwardRef<HTMLDivElement, Props>(
-  ({ motionTransition, motionTranslate, className, ...props }, ref) => {
-    const [cssProps, restProps] = splitCssProps(props);
-    const { css: cssProp, ...styleProps } = cssProps;
-
-    const cssClass = css(styleProps, cssProp);
-
-    return (
-      <motion.div
-        ref={ref}
-        className={classNames(className, cssClass)}
-        transition={motionTransition}
-        translate={motionTranslate}
-        {...restProps}
-      />
-    );
-  },
-);
-MotionBox.displayName = 'MotionBox';
+export interface SquareProps
+  extends Omit<ComponentProps<typeof Square>, 'children'> {
+  children: ReactNode;
+}

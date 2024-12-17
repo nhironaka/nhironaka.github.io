@@ -2,11 +2,12 @@ import { DIRECTIONS } from '@shared/constants/ui';
 import { assertNever } from '@shared/helpers';
 import { coord } from '@shared/helpers/grid';
 import type { Direction } from '@shared/types/ui';
+import random from 'random';
 import { fromCoord } from '.';
+import { Randomizer } from '../../shared/services/randomizer';
 import { GOAL_TOKENS, TOKENS, WALL_CONFIGS } from '../constants/board';
 import type { BoardState } from '../services/BoardState';
 import type { CellState } from '../services/CellState';
-import { Randomizer } from '../services/randomizer';
 import type {
   GoalState,
   GoalToken,
@@ -110,8 +111,7 @@ export const isBoardCenter = (opt: {
 export const getRandomDifficulty = (
   difficultyConfig: Partial<Record<WallConfig, number>>,
 ) => {
-  let wallConfig =
-    Math.random() < 0.5 ? WALL_CONFIGS.SINGLE : WALL_CONFIGS.CORNER;
+  let wallConfig = random.bool() ? WALL_CONFIGS.SINGLE : WALL_CONFIGS.CORNER;
   let remainingCount = difficultyConfig[wallConfig];
   if (typeof remainingCount === 'number' && remainingCount > 0) {
     difficultyConfig[wallConfig] = remainingCount - 1;
