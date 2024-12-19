@@ -1,6 +1,7 @@
 import random from 'random';
-import { TOKENS } from '../constants/board';
-import { Position } from '../types/board';
+
+import { EMPTY, TOKENS } from '../constants/board';
+import { type Position } from '../types/board';
 
 export interface PositionedElements {
   width: number;
@@ -151,7 +152,6 @@ export function arrangeItemsInCircle(params: {
 }
 
 const COLUMNS = 5;
-const EMPTY = 'empty' as const;
 const rows = new Array<null | typeof EMPTY>(COLUMNS).fill(null);
 
 export function initializeEmptyRows() {
@@ -168,4 +168,22 @@ export function initializeEmptyPlays() {
       token: tokens[(row + column) % tokens.length],
     })),
   );
+}
+
+export function getRelativePosition(
+  target: HTMLElement | null,
+  element: HTMLElement | null,
+) {
+  if (!target || !element) {
+    return {
+      x: 0,
+      y: 0,
+    };
+  }
+  const targetRect = target.getBoundingClientRect();
+  const elementRect = element.getBoundingClientRect();
+  return {
+    x: elementRect.left - targetRect.left,
+    y: elementRect.top - targetRect.top,
+  };
 }

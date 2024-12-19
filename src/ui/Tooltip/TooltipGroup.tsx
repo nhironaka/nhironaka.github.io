@@ -1,6 +1,7 @@
 import { FloatingDelayGroup, type Placement } from '@floating-ui/react';
 import { LayoutGroup } from 'framer-motion';
 import { type ReactNode, useId } from 'react';
+
 import { TooltipGroupContext } from './context';
 
 interface Props {

@@ -1,7 +1,6 @@
-import { motion } from 'framer-motion';
-import { ComponentProps, ReactNode } from 'react';
-
 import { Box, Square as StyledSquare } from '@styled/jsx';
+import { motion } from 'framer-motion';
+import { type ComponentProps, type ReactNode } from 'react';
 
 export const MotionBox = motion.create(Box, {
   forwardMotionProps: true,

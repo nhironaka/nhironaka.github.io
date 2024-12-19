@@ -1,10 +1,10 @@
+import { Flex } from '@styled/jsx';
 import { useState } from 'react';
 
-import { Flex } from '@styled/jsx';
 import { Board } from './components/Board';
 import { TOKENS } from './constants';
 import { BoardState } from './services/BoardState';
-import { Token } from './types';
+import { type Token } from './types';
 
 export function Game() {
   const [activePlayer, setActivePlayer] = useState<Token>(TOKENS.RED);

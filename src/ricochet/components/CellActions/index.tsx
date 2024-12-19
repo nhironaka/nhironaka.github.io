@@ -4,12 +4,12 @@ import {
   ArrowRightCircleIcon,
   ArrowUpCircleIcon,
 } from '@heroicons/react/24/solid';
-import type { Dispatch, SetStateAction } from 'react';
-
 import { DIRECTIONS } from '@shared/constants/ui';
 import type { Direction } from '@shared/types/ui';
 import { Box, Flex } from '@styled/jsx';
 import { Button } from '@ui/Button';
+import type { Dispatch, SetStateAction } from 'react';
+
 import { allowedDirection } from '../../helpers/board';
 import type { BoardState } from '../../services/BoardState';
 import type { CellState } from '../../services/CellState';

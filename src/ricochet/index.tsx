@@ -1,10 +1,12 @@
-import { useRef, useState } from 'react';
-
 import { PLAYERS } from '@shared/constants';
 import { coord } from '@shared/helpers/grid';
 import { type Player } from '@shared/types';
+import { Box, Flex } from '@styled/jsx';
 import { Button } from '@ui/Button';
+import { useRef, useState } from 'react';
+
 import { Randomizer } from '../shared/services/randomizer';
+
 import { Board } from './components/Board';
 import { Controller } from './components/Controller';
 import { NextPlay } from './components/NextPlay';
@@ -18,8 +20,6 @@ import {
   type Token,
   type TokenState,
 } from './types/board';
-
-import { Box, Flex } from '@styled/jsx';
 
 interface Props {
   gridSize?: number;

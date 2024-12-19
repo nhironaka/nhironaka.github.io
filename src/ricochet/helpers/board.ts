@@ -3,7 +3,7 @@ import { assertNever } from '@shared/helpers';
 import { coord } from '@shared/helpers/grid';
 import type { Direction } from '@shared/types/ui';
 import random from 'random';
-import { fromCoord } from '.';
+
 import { Randomizer } from '../../shared/services/randomizer';
 import { GOAL_TOKENS, TOKENS, WALL_CONFIGS } from '../constants/board';
 import type { BoardState } from '../services/BoardState';
@@ -15,6 +15,8 @@ import type {
   TokenState,
   WallConfig,
 } from '../types/board';
+
+import { fromCoord } from '.';
 
 export const getBoardCenter = (gridSize: number) => {
   const gridCenter = Math.floor(gridSize / 2);

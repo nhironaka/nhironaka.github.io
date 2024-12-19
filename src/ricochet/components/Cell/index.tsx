@@ -1,6 +1,7 @@
 import { coord } from '@shared/helpers/grid';
 import { Box } from '@styled/jsx';
 import { Square } from '@ui/Square';
+
 import { WALL_CONFIGS } from '../../constants/board';
 import { getWallConfig } from '../../helpers/board';
 import { type CellState } from '../../services/CellState';
@@ -10,6 +11,7 @@ import type {
 } from '../../types/board';
 import { GoalToken } from '../GoalToken';
 import { Token } from '../Token';
+
 import { Wall } from './Wall';
 
 interface Props {

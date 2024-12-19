@@ -1,6 +1,6 @@
+import { type JsxStyleProps } from '@styled/types';
 import { type ReactElement } from 'react';
 
-import { JsxStyleProps } from '@styled/types';
 import { PopoverContext } from './context';
 import { type PopoverOptions, usePopover } from './hooks';
 import { PopoverContent } from './PopoverContent';

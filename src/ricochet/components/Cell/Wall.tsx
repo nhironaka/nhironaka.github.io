@@ -1,8 +1,7 @@
-import classNames from 'classnames';
-
 import { DIRECTIONS } from '@shared/constants/ui';
 import type { Direction } from '@shared/types/ui';
 import { Box, styled } from '@styled/jsx';
+import classNames from 'classnames';
 
 interface Props {
   direction: Direction;

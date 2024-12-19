@@ -1,19 +1,19 @@
 import {
+  type Placement,
+  type UseFloatingReturn,
+  type UseInteractionsReturn,
   autoUpdate,
   flip,
-  type Placement,
   shift,
   useClick,
   useDismiss,
   useFloating,
-  UseFloatingReturn,
   useInteractions,
-  UseInteractionsReturn,
   useRole,
 } from '@floating-ui/react';
 import { useContext, useMemo, useState } from 'react';
 
-import { PopoverContext, PopoverContextType } from './context';
+import { PopoverContext, type PopoverContextType } from './context';
 
 export interface PopoverOptions {
   initialOpen?: boolean;

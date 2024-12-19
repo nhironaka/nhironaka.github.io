@@ -1,15 +1,17 @@
-import { Dispatch, SetStateAction, useRef, useState } from 'react';
-
 import { coord } from '@shared/helpers/grid';
 import { cva } from '@styled/css';
 import { Box, Circle, Flex, Grid } from '@styled/jsx';
 import { token as pandaToken } from '@styled/tokens';
 import { MotionBox } from '@ui/Motion';
 import classNames from 'classnames';
+import { type Dispatch, type SetStateAction, useRef, useState } from 'react';
+
 import { BOARD_SIZE, TOKENS } from '../constants';
-import { BoardState } from '../services/BoardState';
-import { Token } from '../types';
-import { Cell, tokenRecipe } from './Cell';
+import { tokenRecipe } from '../constants/recipes';
+import { type BoardState } from '../services/BoardState';
+import { type Token } from '../types';
+
+import { Cell } from './Cell';
 import { EmptyCell } from './EmptyCell';
 
 interface Props {

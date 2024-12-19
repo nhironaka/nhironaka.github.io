@@ -1,27 +1,15 @@
 import { coord } from '@shared/helpers/grid';
-import { cva } from '@styled/css';
 import { Circle } from '@styled/jsx';
-import { Square, SquareProps } from '@ui/Motion';
-import { Token } from '../types';
+import { Square, type SquareProps } from '@ui/Motion';
+
+import { tokenRecipe } from '../constants/recipes';
+import { type Token } from '../types';
 
 interface Props extends Omit<SquareProps, 'x' | 'y' | 'children'> {
   x: number;
   y: number;
   token: Token;
 }
-
-export const tokenRecipe = cva({
-  variants: {
-    token: {
-      red: {
-        bg: 'indigo.500',
-      },
-      black: {
-        bg: 'emerald.500',
-      },
-    },
-  },
-});
 
 export function Cell({ x, y, token, ...rest }: Props) {
   const cellPos = coord`${[x, y]}`;

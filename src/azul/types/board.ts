@@ -1,5 +1,7 @@
 import { type ConstValues } from '@shared/types/utils';
-import { TOKENS } from '../constants/board';
+
+import { type TOKENS } from '../constants/board';
+import { type PositionedElements } from '../helpers/placement';
 
 export type Token = ConstValues<typeof TOKENS>;
 
@@ -14,4 +16,10 @@ export interface Pile {
     position: Position;
     token: Token;
   }>;
+}
+
+export interface DiscardedToken extends PositionedElements {
+  startingPosition?: Position;
+  token: Token;
+  pileId: string;
 }

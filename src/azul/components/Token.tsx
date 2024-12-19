@@ -1,7 +1,9 @@
 import { styled } from '@styled/jsx';
-import { JsxStyleProps } from '@styled/types';
+import { type JsxStyleProps } from '@styled/types';
 import { Square, type SquareProps } from '@ui/Motion';
-import { Token as TokenType } from '../types/board';
+
+import { type EMPTY } from '../constants/board';
+import { type Token as TokenType } from '../types/board';
 
 const StyledToken = styled('div', {
   variants: {
@@ -19,7 +21,7 @@ const StyledToken = styled('div', {
 });
 
 interface Props extends Partial<SquareProps> {
-  tokenColor: TokenType | 'empty';
+  tokenColor: TokenType | typeof EMPTY;
   innerTokenProps?: Partial<JsxStyleProps>;
 }
 

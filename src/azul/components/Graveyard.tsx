@@ -1,5 +1,8 @@
 import { Flex } from '@styled/jsx';
-import { Token as TokenType } from '../types/board';
+
+import { EMPTY } from '../constants/board';
+import { type Token as TokenType } from '../types/board';
+
 import { Token } from './Token';
 
 interface Props {
@@ -12,11 +15,7 @@ export function Graveyard({ points }: Props) {
   return (
     <Flex gap="2">
       {POINTS.map((point, idx) => (
-        <Token
-          key={idx}
-          tokenColor={points[idx] ?? 'empty'}
-          position="relative"
-        >
+        <Token key={idx} tokenColor={points[idx] ?? EMPTY} position="relative">
           <Flex
             width="full"
             height="full"

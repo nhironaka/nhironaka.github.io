@@ -1,9 +1,9 @@
 import { useMergeRefs } from '@floating-ui/react';
 import {
-  cloneElement,
-  forwardRef,
   type HTMLProps,
   type ReactElement,
+  cloneElement,
+  forwardRef,
 } from 'react';
 
 import { usePopoverContext } from './hooks';
@@ -17,6 +17,7 @@ export const PopoverTrigger = forwardRef<
   HTMLProps<HTMLElement> & PopoverTriggerProps
 >(({ children, ...props }, propRef) => {
   const { getReferenceProps, open, refs } = usePopoverContext();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const ref = useMergeRefs([refs.setReference, (children as any).ref, propRef]);
 
   return cloneElement(

@@ -3,18 +3,18 @@ import {
   FloatingPortal,
   useMergeRefs,
 } from '@floating-ui/react';
+import { TRANSLATE_MAP } from '@shared/constants/ui';
+import { type Direction } from '@shared/types/ui';
+import { css, cva } from '@styled/css';
+import { type JsxStyleProps } from '@styled/types';
+import { MotionBox } from '@ui/Motion';
 import classNames from 'classnames';
 import { AnimatePresence } from 'framer-motion';
 import { forwardRef, type HTMLProps } from 'react';
 
-import { TRANSLATE_MAP } from '@shared/constants/ui';
-import { type Direction } from '@shared/types/ui';
-import { styled } from '@styled/jsx';
-import { JsxStyleProps } from '@styled/types';
-import { MotionBox } from '@ui/Motion';
 import { usePopoverContext } from './hooks';
 
-const StyledPopoverContent = styled(MotionBox, {
+const popoverStyle = cva({
   base: {
     bg: 'white',
     p: '4',
@@ -141,17 +141,23 @@ export const PopoverContent = forwardRef<
     <FloatingPortal>
       <FloatingFocusManager context={floatingContext} modal={modal}>
         <AnimatePresence>
-          <StyledPopoverContent
-            className={classNames('popover', tooltipDirection, className)}
+          <MotionBox
+            className={classNames(
+              'popover',
+              tooltipDirection,
+              className,
+              css(styleOverrides),
+              popoverStyle({
+                arrowPlacement: tooltipDirection,
+              }),
+            )}
             initial={open}
             animate={open}
             variants={{
               true: { opacity: 1, translateX: 0, translateY: 0 },
               false: { opacity: 0, ...translate },
             }}
-            motionTransition={{ duration: 0.2 }}
-            arrowPlacement={tooltipDirection}
-            {...styleOverrides}
+            transition={{ duration: 0.2 }}
             {...getFloatingProps({
               ...props,
               ref: mergedRefs,
@@ -170,7 +176,7 @@ export const PopoverContent = forwardRef<
             >
               {children}
             </MotionBox>
-          </StyledPopoverContent>
+          </MotionBox>
         </AnimatePresence>
       </FloatingFocusManager>
     </FloatingPortal>

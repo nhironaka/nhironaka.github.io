@@ -1,4 +1,5 @@
 import { Button } from '@ui/Button';
+
 import { type GoalToken as GoalTokenType } from '../../types/board';
 import { GoalToken } from '../GoalToken';
 

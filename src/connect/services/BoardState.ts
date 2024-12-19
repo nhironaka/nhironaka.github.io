@@ -1,6 +1,8 @@
 import { coord, generateMatrix } from '@shared/helpers/grid';
+
 import { BOARD_SIZE, TOKENS, TRAVEL_DIRECTIONS } from '../constants';
-import { Coord, Token } from '../types';
+import { type Coord, type Token } from '../types';
+
 import { CellState } from './CellState';
 
 export class BoardState {

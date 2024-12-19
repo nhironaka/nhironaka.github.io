@@ -1,4 +1,4 @@
-import { Token } from '../types';
+import { type Token } from '../types';
 
 interface CellStateOptions {
   x: number;

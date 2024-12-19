@@ -16,10 +16,10 @@ import {
   StarIcon,
   TrophyIcon,
 } from '@heroicons/react/24/outline';
-import { type ComponentProps } from 'react';
-
 import { css } from '@styled/css';
 import { Box } from '@styled/jsx';
+import { type ComponentProps } from 'react';
+
 import { GOAL_TOKENS } from '../../constants/board';
 import { Token } from '../Token';
 

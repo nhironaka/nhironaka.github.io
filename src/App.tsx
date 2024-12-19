@@ -1,11 +1,10 @@
-import { Link, Outlet, useLocation } from 'react-router-dom';
-
 import { INDEX } from '@shared/constants';
 import { css } from '@styled/css';
 import { Box, Flex } from '@styled/jsx';
-import { buttonRecipe } from '@ui/Button';
+import { buttonRecipe } from '@ui/Button/recipes';
 import { Li, Ul } from '@ui/index';
 import classNames from 'classnames';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 
 const menu = [
   {

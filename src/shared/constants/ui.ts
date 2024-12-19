@@ -1,6 +1,5 @@
-import type { Target } from 'framer-motion';
-
 import { type Direction } from '@shared/types/ui';
+import type { Target } from 'framer-motion';
 
 export const floatingStates = {
   UNMOUNTED: 'unmounted',

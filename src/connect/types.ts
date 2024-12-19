@@ -1,4 +1,5 @@
 import { type ConstValues } from '@shared/types/utils';
+
 import { type TOKENS } from './constants';
 
 export type Token = ConstValues<typeof TOKENS>;

@@ -3,11 +3,11 @@ import type { CSSProperties } from 'react';
 
 import {
   type ColorsTable,
-  type HexOpacity,
   type HSLObject,
+  type HexOpacity,
   type RGBObject,
-  type Tints,
   type TintShadesTable,
+  type Tints,
 } from '../types/styles';
 
 const tints: TintShadesTable = {
@@ -312,7 +312,6 @@ export const getContrastColor = ({
   contrastColors,
 }: GetColorContrastProps): string => {
   if (!validHex(baseColor)) {
-    // eslint-disable-next-line no-console
     console.warn(`baseColor ${baseColor} is not a valid hex`);
     baseColor = '#000000';
   }

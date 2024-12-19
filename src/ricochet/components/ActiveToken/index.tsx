@@ -1,3 +1,6 @@
+import { coord } from '@shared/helpers/grid';
+import { MotionBox } from '@ui/Motion';
+import { Popover } from '@ui/Popover';
 import {
   type Dispatch,
   type SetStateAction,
@@ -6,9 +9,6 @@ import {
   useState,
 } from 'react';
 
-import { coord } from '@shared/helpers/grid';
-import { MotionBox } from '@ui/Motion';
-import { Popover } from '@ui/Popover';
 import type { BoardState } from '../../services/BoardState';
 import type { CellState } from '../../services/CellState';
 import type { Coord, TokenState, Token as TokenType } from '../../types/board';

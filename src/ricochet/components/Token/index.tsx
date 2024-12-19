@@ -1,6 +1,6 @@
-import { forwardRef, type ReactNode } from 'react';
+import { type FlexProps, styled } from '@styled/jsx';
+import { type ReactNode, forwardRef } from 'react';
 
-import { styled, type FlexProps } from '@styled/jsx';
 import type { GoalToken, Token as TokenType } from '../../types/board';
 
 interface Props extends Omit<FlexProps, 'direction'> {

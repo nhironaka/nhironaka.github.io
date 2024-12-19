@@ -2,6 +2,7 @@ import { DIRECTIONS } from '@shared/constants/ui';
 import { assertNever, getRandomInt } from '@shared/helpers';
 import { type Direction } from '@shared/types/ui';
 import random from 'random';
+
 import { WALL_CONFIGS } from '../constants/board';
 import { isBoardEdge } from '../helpers/board';
 import { type WallConfig } from '../types/board';

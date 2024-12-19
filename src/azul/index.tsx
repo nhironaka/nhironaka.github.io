@@ -1,15 +1,19 @@
 import { Box, Circle, Flex } from '@styled/jsx';
 import { MotionBox } from '@ui/Motion';
-import { useState } from 'react';
+import { type RefObject, useCallback, useRef, useState } from 'react';
+
 import { Coaster } from './components/Coaster';
 import { PlayerBoard } from './components/PlayerBoard';
 import { Token } from './components/Token';
-import { PILE_RADIUS } from './constants/board';
-import { arrangeItemsInCircle, PositionedElements } from './helpers/placement';
+import { EMPTY, PILE_RADIUS } from './constants/board';
+import { arrangeItemsInCircle, getRelativePosition } from './helpers/placement';
 import { useEvent } from './hooks/useEvent';
-import { useFlyingElement } from './hooks/useFlyingTarget';
 import { BoardState } from './services/board';
-import { Pile, Position, Token as TokenType } from './types/board';
+import {
+  type DiscardedToken,
+  type Pile,
+  type Token as TokenType,
+} from './types/board';
 /*
 (
     <div>
@@ -47,84 +51,127 @@ import { Pile, Position, Token as TokenType } from './types/board';
   */
 
 export function Game() {
-  const { addListener } = useEvent();
-  const [focusedBoard, setFocusedBoard] = useState('');
-  const [game, setGame] = useState(new BoardState());
-  const [discardedTokens, setDiscardedTokens] = useState<
-    Array<
-      PositionedElements & {
-        startingPosition?: Position;
-        token: TokenType;
-      }
-    >
-  >([]);
-  const [activePlayer, setActivePlayer] = useState(0);
+  const discardPileRef = useRef<HTMLDivElement>(null);
+  const coasterRefs = useRef<Record<string, RefObject<HTMLDivElement | null>>>(
+    {},
+  );
+  const [selectedToken, setSelectedToken] = useState<{
+    pileId: string;
+    token: TokenType | typeof EMPTY;
+    numTokens: number;
+  }>({ pileId: '', token: EMPTY, numTokens: 0 });
+  const { addListener, dispatch } = useEvent<string>();
+  const [game] = useState(new BoardState(4));
+  const [discardedTokens, setDiscardedTokens] = useState<Array<DiscardedToken>>(
+    [],
+  );
+  const [activePlayer] = useState(0);
   const placement = arrangeItemsInCircle({
     n: game.piles.length,
     radius: 400,
     width: PILE_RADIUS * 2,
     height: PILE_RADIUS * 2,
   });
-  const { flyToTarget, isFlying, startPosition, endPosition, setIsFlying } =
-    useFlyingElement();
 
-  const returnTokens = (tokens: Pile['tokens'], selectedToken: TokenType) => {
+  const returnTokens = (pile: Pile, selectedToken: TokenType) => {
+    const { id } = pile;
     const discardedTokens = game.returnTokens({
-      discardTokens: tokens.filter(({ token }) => token !== selectedToken),
-      selectedToken,
-      activePlayer,
+      pile,
     });
+    console.log(discardedTokens);
     setDiscardedTokens((prev) =>
       prev.map(({ startingPosition, ...rest }) => rest).concat(discardedTokens),
     );
-    setIsFlying(true);
-
-    setActivePlayer((activePlayer + 1) % game.players.length);
+    setSelectedToken({
+      pileId: id,
+      token: selectedToken,
+      numTokens: pile.tokens.length - discardedTokens.length,
+    });
   };
 
+  const addRef = useCallback(
+    (id: string, ref: RefObject<HTMLDivElement | null>) => {
+      const { current } = coasterRefs;
+      current[id] = ref;
+
+      return () => {
+        delete current[id];
+      };
+    },
+    [],
+  );
+
   return (
-    <Box p="4" width="full" height="full" overflow="auto">
-      <Flex position="relative" width="800px" height="800px">
-        <Box position="absolute" top="250px" left="250px">
-          <Circle position="relative" width="300px" height="300px" bg="gray.50">
-            {discardedTokens.map(
-              ({ position, startingPosition, token }, idx) =>
-                startingPosition ? (
-                  <MotionBox
-                    key={idx}
-                    initial={{ x: startingPosition.x, y: startingPosition.y }}
-                    animate={{ x: position.x, y: position.y }}
-                    transition={{ duration: 1, ease: 'easeInOut' }}
-                  >
-                    <Token tokenColor={token} />
-                  </MotionBox>
-                ) : (
-                  <Token tokenColor={token} />
-                ),
-            )}
-          </Circle>
-        </Box>
-        {placement.map(({ position: { x, y } }, idx) => (
-          <Box key={idx} position="absolute" style={{ left: x, top: y }}>
-            <Coaster
-              addEventListener={addListener}
-              returnTokens={returnTokens}
-              key={idx}
-              pile={game.piles[idx]}
-            />
+    <Flex p="4" width="full" height="full" overflow="auto" flexWrap="wrap">
+      <Box width="50%" height="full">
+        <Flex position="relative" width="800px" height="800px">
+          <Box position="absolute" top="250px" left="250px">
+            <Circle
+              ref={discardPileRef}
+              position="relative"
+              width="300px"
+              height="300px"
+              bg="gray.50"
+            >
+              {discardedTokens.map(
+                ({ position, startingPosition, token, pileId }, idx) => {
+                  const { x: relativeX, y: relativeY } = getRelativePosition(
+                    discardPileRef.current,
+                    coasterRefs.current[pileId].current,
+                  );
+                  return startingPosition ? (
+                    <MotionBox
+                      key={idx}
+                      initial={{
+                        x: startingPosition.x - relativeX,
+                        y: startingPosition.y - relativeY,
+                      }}
+                      animate={{ x: position.x, y: position.y }}
+                      transition={{ duration: 1, ease: 'easeInOut' }}
+                      onAnimationStart={() => {
+                        const { pileId, token } = selectedToken;
+                        dispatch(pileId, token);
+                        console.log(startingPosition, position);
+                      }}
+                    >
+                      <Token tokenColor={token} />
+                    </MotionBox>
+                  ) : (
+                    <Token
+                      key={idx}
+                      position="absolute"
+                      tokenColor={token}
+                      style={{ top: position.y, left: position.x }}
+                    />
+                  );
+                },
+              )}
+            </Circle>
           </Box>
-        ))}
-      </Flex>
-      <Flex gap="2">
-        {game.players.map((player) => (
+          {placement.map(({ position: { x, y } }, idx) => (
+            <Box key={idx} position="absolute" style={{ left: x, top: y }}>
+              <Coaster
+                addRef={addRef}
+                addEventListener={addListener}
+                returnTokens={returnTokens}
+                key={idx}
+                pile={game.piles[idx]}
+              />
+            </Box>
+          ))}
+        </Flex>
+      </Box>
+      <Flex flexDirection="column" width="50%" gap="2" height="full">
+        {game.players.map((player, idx) => (
           <PlayerBoard
+            selectedToken={idx === activePlayer ? selectedToken.token : EMPTY}
+            numTokens={selectedToken.numTokens}
             key={player.name}
-            toggleSize={setFocusedBoard}
-            expanded={focusedBoard === player.name}
+            expanded={idx === activePlayer}
             player={player}
           />
         ))}
       </Flex>
-    </Box>
+    </Flex>
   );
 }

@@ -13,6 +13,10 @@ import {
   useInteractions,
   useRole,
 } from '@floating-ui/react';
+import { TRANSLATE_MAP } from '@shared/constants/ui';
+import { type Direction } from '@shared/types/ui';
+import { Box } from '@styled/jsx';
+import { MotionBox } from '@ui/Motion';
 import { AnimatePresence } from 'framer-motion';
 import {
   type ReactNode,
@@ -23,10 +27,6 @@ import {
   useState,
 } from 'react';
 
-import { TRANSLATE_MAP } from '@shared/constants/ui';
-import { type Direction } from '@shared/types/ui';
-import { Box } from '@styled/jsx';
-import { MotionBox } from '@ui/Motion';
 import { TooltipGroupContext } from './context';
 
 interface Props {

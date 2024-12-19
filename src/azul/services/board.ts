@@ -1,11 +1,10 @@
 import { Randomizer } from '@shared/services/randomizer';
 import random from 'random';
-import { PILE_RADIUS, TOKEN_SIZE, TOKENS } from '../constants/board';
-import {
-  placeRandomElementsInCircle,
-  PositionedElements,
-} from '../helpers/placement';
-import { Pile, Position, Token } from '../types/board';
+
+import { PILE_RADIUS, TOKENS, TOKEN_SIZE } from '../constants/board';
+import { placeRandomElementsInCircle } from '../helpers/placement';
+import { type DiscardedToken, type Pile, type Token } from '../types/board';
+
 import { Player } from './player';
 
 const PILE_SIZE = 4;
@@ -19,11 +18,7 @@ const NUM_PILES: Record<number, number> = {
 };
 
 export class BoardState {
-  discards: Array<
-    PositionedElements & {
-      token: Token;
-    }
-  >;
+  discards: Array<DiscardedToken>;
   players: Array<Player>;
   piles: Array<Pile>;
   randomizer: Randomizer<Token>;
@@ -81,21 +76,17 @@ export class BoardState {
     return this.getToken();
   }
 
-  returnTokens(params: {
-    discardTokens: Pile['tokens'];
-    selectedToken: Token;
-    activePlayer: number;
-  }) {
-    const { discardTokens } = params;
-    const discardedTokens = placeRandomElementsInCircle<{
-      startingPosition: Position;
-      token: Token;
-    }>({
+  returnTokens(params: { pile: Pile }) {
+    const {
+      pile: { tokens: discardTokens, id },
+    } = params;
+    const discardedTokens = placeRandomElementsInCircle({
       allowOverlap: true,
       radius: DISCARD_RADIUS,
       elements: discardTokens.map(({ position: startingPosition, token }) => ({
         startingPosition,
         token,
+        pileId: id,
       })),
       elementWidth: TOKEN_SIZE,
       elementHeight: TOKEN_SIZE,

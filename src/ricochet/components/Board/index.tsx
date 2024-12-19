@@ -1,3 +1,6 @@
+import { coord } from '@shared/helpers/grid';
+import { Box, Flex, Grid } from '@styled/jsx';
+import { token } from '@styled/tokens';
 import {
   type Dispatch,
   type SetStateAction,
@@ -6,9 +9,6 @@ import {
   useState,
 } from 'react';
 
-import { coord } from '@shared/helpers/grid';
-import { Box, Flex, Grid } from '@styled/jsx';
-import { token } from '@styled/tokens';
 import { TOKENS } from '../../constants/board';
 import { type BoardState } from '../../services/BoardState';
 import type { GoalState, Token, TokenState } from '../../types/board';

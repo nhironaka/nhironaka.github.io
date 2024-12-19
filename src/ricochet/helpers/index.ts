@@ -1,4 +1,5 @@
 import { COORD_DELIMITER } from '@shared/constants';
+
 import { type Coord } from '../types/board';
 
 export function fromCoord(xy: string): Coord {
