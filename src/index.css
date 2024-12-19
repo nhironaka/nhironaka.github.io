@@ -1,6 +1,0 @@
-@layer reset, base, tokens, recipes, utilities;
-
-#root {
-  width: 100vw;
-  height: 100vh;
-}
