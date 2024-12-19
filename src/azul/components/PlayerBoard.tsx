@@ -1,9 +1,14 @@
 import { Box, Flex } from '@styled/jsx';
 import { MotionBox } from '@ui/Motion';
+import { type MutableRefObject, type RefObject, useRef, useState } from 'react';
 
-import { type EMPTY } from '../constants/board';
+import { EMPTY } from '../constants/board';
 import { type Player } from '../services/player';
-import type { Token as TokenType } from '../types/board';
+import {
+  type Pile,
+  type PlayedToken,
+  type Token as TokenType,
+} from '../types/board';
 
 import { Board } from './Board';
 import { Graveyard } from './Graveyard';
@@ -12,24 +17,77 @@ import { Token } from './Token';
 interface Props {
   player: Player;
   expanded: boolean;
-  selectedToken: TokenType | typeof EMPTY;
-  numTokens: number;
+  selectedTokenState: Pile | undefined;
+  coasterRefs: MutableRefObject<
+    Record<string, RefObject<HTMLDivElement | null>>
+  >;
 }
 
-const WIDTH = 770;
+const WIDTH = 772;
+const HEIGHT = 456;
+
+function getShadowTokens(params: {
+  selectedToken: TokenType | typeof EMPTY;
+  row: Array<TokenType | typeof EMPTY | null>;
+  numTokens: number;
+}) {
+  const { selectedToken, row, numTokens } = params;
+  if (selectedToken === EMPTY || row.length === 0) {
+    return [];
+  }
+  const emptySlots = row.filter((value) => value === EMPTY);
+
+  if (emptySlots.length < numTokens) {
+    return Array.from(
+      { length: numTokens - emptySlots.length },
+      () => selectedToken,
+    );
+  }
+  return [];
+}
+
+const GRAVEYARD_IDX = 5;
 
 export function PlayerBoard({
   player,
   expanded,
-  selectedToken,
-  numTokens,
+  selectedTokenState,
+  coasterRefs,
 }: Props) {
+  const { tokens = [] } = selectedTokenState ?? {};
+  const numTokens = tokens.length;
+  const selectedToken = numTokens ? tokens[0].token : EMPTY;
+  const tokenRefs = useRef<Array<Array<HTMLDivElement>>>([]);
+  const [playingTokens, setPlayingTokens] = useState<Array<PlayedToken>>([]);
+  const [hoveringRow, setHoveringRow] = useState(-1);
+  const shadowTokens = getShadowTokens({
+    selectedToken,
+    row: player.board[hoveringRow] ?? [],
+    numTokens,
+  });
+  const playTokens = (rowIdx: number) => {
+    const rowRefs = tokenRefs.current[rowIdx] ?? [];
+    const row = player.board[hoveringRow] ?? [];
+
+    if (!rowRefs.length || !row.length || !selectedTokenState) {
+      return;
+    }
+    // setPlayingTokens(selectedTokenState.tokens.map(({ position: startingPosition, ...token}) => ({
+    //   ...token,
+    //   startingPosition,
+    //   position:
+    // })))
+    console.log(shadowTokens, selectedTokenState);
+  };
   return (
     <MotionBox
       display="flex"
       flexDirection="column"
       key={player.name}
-      width={expanded ? WIDTH : WIDTH / 2}
+      style={{
+        width: expanded ? WIDTH : WIDTH / 2,
+        height: expanded ? HEIGHT : HEIGHT / 2,
+      }}
     >
       <Box color="dustyTeal.800">{player.name}</Box>
 
@@ -53,15 +111,34 @@ export function PlayerBoard({
       >
         <Flex flexWrap="nowrap" gap="76px">
           <Board
-            renderItem={(token, { hovering, idx }) => {
-              const showShadow = hovering && 5 - idx < numTokens;
+            onHover={setHoveringRow}
+            renderItem={(token, { idx, rowIdx }) => {
+              const showShadow = hoveringRow === rowIdx && 4 - idx < numTokens;
 
               return token ? (
-                <Token tokenColor={showShadow ? selectedToken : token} />
+                <Token
+                  ref={(node) => {
+                    if (node) {
+                      tokenRefs.current[rowIdx] =
+                        tokenRefs.current[rowIdx] ?? [];
+                      tokenRefs.current[rowIdx][idx] = node;
+                    }
+                  }}
+                  onClick={() => playTokens(rowIdx)}
+                  tokenColor={showShadow ? selectedToken : token}
+                />
               ) : null;
             }}
             items={player.board}
-          />
+          >
+            {/* {playingTokens.length > 0 && 
+              <AnimateTokens
+                tokensToAnimate={playingTokens}
+                coasterRefs={coasterRefs}
+                
+              />
+            } */}
+          </Board>
           <Board
             renderItem={({ token, played }) => (
               <Flex position="relative">
@@ -78,7 +155,15 @@ export function PlayerBoard({
             items={player.played}
           />
         </Flex>
-        <Graveyard points={player.graveyard} />
+        <Graveyard
+          addRef={(idx, node) => {
+            tokenRefs.current[GRAVEYARD_IDX] =
+              tokenRefs.current[GRAVEYARD_IDX] ?? [];
+            tokenRefs.current[GRAVEYARD_IDX][idx] = node;
+          }}
+          shadowTokens={shadowTokens}
+          points={player.graveyard}
+        />
       </MotionBox>
     </MotionBox>
   );

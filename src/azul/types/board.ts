@@ -18,7 +18,7 @@ export interface Pile {
   }>;
 }
 
-export interface DiscardedToken extends PositionedElements {
+export interface PlayedToken extends PositionedElements {
   startingPosition?: Position;
   token: Token;
   pileId: string;

@@ -1,21 +1,32 @@
 import { Flex, type FlexProps, Grid, GridItem } from '@styled/jsx';
-import { type ReactNode, useState } from 'react';
+import { type ReactNode } from 'react';
 
 interface Props<T> extends Partial<FlexProps> {
   items: Array<Array<T>>;
+  onHover?(row: number): void;
   renderItem(
     item: T,
     state: {
-      hovering: boolean;
       idx: number;
+      rowIdx: number;
     },
   ): ReactNode;
 }
-export function Board<T>({ items, renderItem, ...rest }: Props<T>) {
-  const [hoveringRow, setHoveringRow] = useState(-1);
-
+export function Board<T>({
+  items,
+  renderItem,
+  onHover,
+  children,
+  ...rest
+}: Props<T>) {
   return (
-    <Flex flexWrap="nowrap" flexDirection="column" gap="2" {...rest}>
+    <Flex
+      flexWrap="nowrap"
+      flexDirection="column"
+      gap="2"
+      position="relative"
+      {...rest}
+    >
       {items.map((row, rowIdx) => (
         <Grid
           flexWrap="nowrap"
@@ -23,22 +34,23 @@ export function Board<T>({ items, renderItem, ...rest }: Props<T>) {
           gap="2"
           key={rowIdx}
           onMouseEnter={() => {
-            setHoveringRow(rowIdx);
+            onHover?.(rowIdx);
           }}
           onMouseLeave={() => {
-            setHoveringRow(-1);
+            onHover?.(-1);
           }}
         >
           {row.map((item, idx) => (
             <GridItem key={idx}>
               {renderItem(item, {
-                hovering: hoveringRow === rowIdx,
                 idx,
+                rowIdx,
               })}
             </GridItem>
           ))}
         </Grid>
       ))}
+      {children}
     </Flex>
   );
 }

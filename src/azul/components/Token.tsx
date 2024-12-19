@@ -1,6 +1,7 @@
 import { styled } from '@styled/jsx';
 import { type JsxStyleProps } from '@styled/types';
 import { Square, type SquareProps } from '@ui/Motion';
+import { forwardRef } from 'react';
 
 import { type EMPTY } from '../constants/board';
 import { type Token as TokenType } from '../types/board';
@@ -25,22 +26,21 @@ interface Props extends Partial<SquareProps> {
   innerTokenProps?: Partial<JsxStyleProps>;
 }
 
-export function Token({
-  tokenColor,
-  children,
-  innerTokenProps,
-  ...rest
-}: Props) {
-  return (
-    <Square width="60px" height="60px" borderRadius="lg" {...rest}>
-      <StyledToken
-        width="full"
-        height="full"
-        borderRadius="lg"
-        {...innerTokenProps}
-        tokenColor={tokenColor}
-      />
-      {children}
-    </Square>
-  );
-}
+export const Token = forwardRef<HTMLDivElement, Props>(
+  ({ tokenColor, children, innerTokenProps, ...rest }, ref) => {
+    return (
+      <Square width="60px" height="60px" borderRadius="lg" {...rest} ref={ref}>
+        <StyledToken
+          width="full"
+          height="full"
+          borderRadius="lg"
+          {...innerTokenProps}
+          tokenColor={tokenColor}
+        />
+        {children}
+      </Square>
+    );
+  },
+);
+
+Token.displayName = 'Token';

@@ -3,13 +3,17 @@ import random from 'random';
 
 import { PILE_RADIUS, TOKENS, TOKEN_SIZE } from '../constants/board';
 import { placeRandomElementsInCircle } from '../helpers/placement';
-import { type DiscardedToken, type Pile, type Token } from '../types/board';
+import { type Pile, type PlayedToken, type Token } from '../types/board';
 
 import { Player } from './player';
 
 const PILE_SIZE = 4;
 
-const DISCARD_RADIUS = 150;
+const DISCARD_RADIUS: Record<number, number> = {
+  2: 150,
+  3: 345 / 2,
+  4: 364 / 2,
+};
 
 const NUM_PILES: Record<number, number> = {
   2: 5,
@@ -18,7 +22,7 @@ const NUM_PILES: Record<number, number> = {
 };
 
 export class BoardState {
-  discards: Array<DiscardedToken>;
+  discards: Array<PlayedToken>;
   players: Array<Player>;
   piles: Array<Pile>;
   randomizer: Randomizer<Token>;
@@ -38,11 +42,12 @@ export class BoardState {
   }
 
   shuffleTokens(): Array<Pile> {
-    return [...new Array(NUM_PILES[this.players.length])].map(() => {
+    const players = this.players.length;
+    return [...new Array(NUM_PILES[players])].map(() => {
       const placements = placeRandomElementsInCircle({
-        radius: PILE_RADIUS,
-        elementWidth: TOKEN_SIZE,
-        elementHeight: TOKEN_SIZE,
+        radius: PILE_RADIUS[players],
+        elementWidth: TOKEN_SIZE[players],
+        elementHeight: TOKEN_SIZE[players],
         elements: Array.from({ length: PILE_SIZE }, () => ({
           token: this.getToken(),
         })),
@@ -76,24 +81,31 @@ export class BoardState {
     return this.getToken();
   }
 
-  returnTokens(params: { pile: Pile }) {
+  returnTokens(params: { pile: Pile; selectedToken: Token }) {
     const {
-      pile: { tokens: discardTokens, id },
+      pile: { tokens, id },
+      selectedToken,
     } = params;
+    const players = this.players.length;
     const discardedTokens = placeRandomElementsInCircle({
       allowOverlap: true,
-      radius: DISCARD_RADIUS,
-      elements: discardTokens.map(({ position: startingPosition, token }) => ({
-        startingPosition,
-        token,
-        pileId: id,
-      })),
-      elementWidth: TOKEN_SIZE,
-      elementHeight: TOKEN_SIZE,
+      radius: DISCARD_RADIUS[players],
+      elements: tokens
+        .filter(({ token }) => token !== selectedToken)
+        .map(({ position: startingPosition, token }) => ({
+          startingPosition,
+          token,
+          pileId: id,
+        })),
+      elementWidth: TOKEN_SIZE[players],
+      elementHeight: TOKEN_SIZE[players],
       startingElements: this.discards,
     });
     this.discards.push(...discardedTokens);
 
-    return discardedTokens;
+    return {
+      discardedTokens,
+      tokensToPlay: tokens.filter(({ token }) => token === selectedToken),
+    };
   }
 }

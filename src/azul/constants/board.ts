@@ -6,8 +6,16 @@ export const TOKENS = {
   PURPLE: 'purple',
 } as const;
 
-export const TOKEN_SIZE = 60;
+export const TOKEN_SIZE: Record<number, number> = {
+  2: 60,
+  3: 55,
+  4: 50,
+};
 
-export const PILE_RADIUS = 250 / 2;
+export const PILE_RADIUS: Record<number, number> = {
+  2: 125,
+  3: 100,
+  4: 90,
+};
 
 export const EMPTY = 'empty' as const;

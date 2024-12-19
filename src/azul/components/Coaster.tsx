@@ -1,7 +1,9 @@
-import { Flex } from '@styled/jsx';
+import { Flex, styled } from '@styled/jsx';
 import { type RefObject, useEffect, useRef, useState } from 'react';
 
 import coaster from '../assets/coaster.svg';
+import { tokenSize } from '../constants/recipes';
+import { useAzulContext } from '../hooks/useAzulContext';
 import { type AddListener } from '../hooks/useEvent';
 import { type Pile, type Token as TokenType } from '../types/board';
 
@@ -12,14 +14,33 @@ interface Props {
   pile: Pile;
   returnTokens(tokens: Pile, selectedToken: TokenType): void;
   addRef(id: string, ref: RefObject<HTMLDivElement | null>): () => void;
+  playActive: boolean;
 }
 
+const Img = styled('img', {
+  variants: {
+    numPlayers: {
+      2: {
+        width: '250px',
+      },
+      3: {
+        width: '200px',
+      },
+      4: {
+        width: '180px',
+      },
+    },
+  },
+});
+
 export function Coaster({
+  playActive,
   pile,
   returnTokens,
   addEventListener,
   addRef,
 }: Props) {
+  const { players } = useAzulContext();
   const ref = useRef<HTMLDivElement>(null);
   const [selectedTokenColor, setSelectedTokenColor] = useState('');
   const [hoveredColor, setHoveredColor] = useState('');
@@ -38,7 +59,7 @@ export function Coaster({
 
   return (
     <Flex position="relative" ref={ref}>
-      <img width="250px" src={coaster} />
+      <Img numPlayers={players} src={coaster} />
       {pile.tokens.map(
         ({ token, position }, idx) =>
           (!selectedTokenColor || selectedTokenColor === token) && (
@@ -49,9 +70,12 @@ export function Coaster({
               style={{ top: position.y, left: position.x }}
             >
               <Token
-                cursor={selectedTokenColor ? 'default' : 'pointer'}
+                className={tokenSize({
+                  numPlayers: players,
+                })}
+                cursor={playActive ? 'default' : 'pointer'}
                 onClick={() => {
-                  if (!selectedTokenColor) {
+                  if (!playActive) {
                     returnTokens(pile, token);
                   }
                 }}
@@ -59,7 +83,8 @@ export function Coaster({
                 onMouseLeave={() => setHoveredColor('')}
                 innerTokenProps={{ boxShadow: 'inner' }}
                 boxShadow={
-                  hoveredColor === token || selectedTokenColor == token
+                  (!playActive && hoveredColor === token) ||
+                  selectedTokenColor == token
                     ? 'lg'
                     : undefined
                 }

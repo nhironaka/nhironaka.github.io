@@ -86,10 +86,18 @@ export function placeRandomElementsInCircle<T>(params: {
       };
 
       // Check if the element is inside the circle and not overlapping
+      const insideCircle = isInsideCircle({
+        x,
+        y,
+        elementHeight,
+        elementWidth,
+        radius,
+      });
       if (
-        (isInsideCircle({ x, y, elementHeight, elementWidth, radius }) ||
-          tries > 8) &&
-        (allowOverlap || !isOverlapping(positionedElements, newElement))
+        (insideCircle || tries > 8) &&
+        (allowOverlap
+          ? tries > 8
+          : !isOverlapping(positionedElements, newElement))
       ) {
         positionedElements.push(newElement);
         placedElements.push(newElement);
