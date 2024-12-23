@@ -1,6 +1,8 @@
-import { Box, Circle, styled } from '@styled/jsx';
+import { Circle } from '@styled/jsx';
 import { type MutableRefObject, type RefObject, useRef, useState } from 'react';
 
+import { PILE_SIZE } from '../constants/board';
+import { getRelativePosition } from '../helpers/placement';
 import { useAzulContext } from '../hooks/useAzulContext';
 import { type Pile, type PlayedToken } from '../types/board';
 
@@ -12,84 +14,65 @@ interface Props {
   coasterRefs: MutableRefObject<
     Record<string, RefObject<HTMLDivElement | null>>
   >;
+  coasterSize: number;
 }
-
-const DiscardCenter = styled(Circle, {
-  base: {
-    position: 'relative',
-  },
-  variants: {
-    numPlayers: {
-      2: {
-        width: '300px',
-        height: '300px',
-      },
-      3: {
-        width: '400px',
-        height: '400px',
-      },
-      4: {
-        width: '440px',
-        height: '440px',
-      },
-    },
-  },
-});
-
-const PileWrapper = styled(Box, {
-  base: {
-    position: 'absolute',
-  },
-  variants: {
-    numPlayers: {
-      2: {
-        top: '250px',
-        left: '250px',
-      },
-      3: {
-        top: '200px',
-        left: '200px',
-      },
-      4: {
-        top: '180px',
-        left: '180px',
-      },
-    },
-  },
-});
 
 export function DiscardPile({
   selectedTokenState,
   discardedTokens,
   coasterRefs,
+  coasterSize,
 }: Props) {
   const [animating, setAnimating] = useState(false);
-  const { players, dispatch } = useAzulContext();
+  const { dispatch } = useAzulContext();
   const discardPileRef = useRef<HTMLDivElement>(null);
+  const pileSize = Math.sqrt((PILE_SIZE - 2 * coasterSize) ** 2);
 
   return (
-    <PileWrapper zIndex={animating ? '1' : undefined} numPlayers={players}>
-      <DiscardCenter numPlayers={players} ref={discardPileRef}>
-        <AnimateTokens
-          tokensToAnimate={discardedTokens}
-          coasterRefs={coasterRefs}
-          relativeElement={() => {
-            return discardPileRef.current;
-          }}
-          onAnimationStart={() => {
-            const {
-              id,
-              tokens: [{ token }],
-            } = selectedTokenState;
-            dispatch(id, token);
+    <Circle
+      position="absolute"
+      ref={discardPileRef}
+      zIndex={animating ? '1' : undefined}
+      style={{
+        width: pileSize,
+        height: pileSize,
+        top: coasterSize,
+        left: coasterSize,
+      }}
+    >
+      <AnimateTokens
+        tokensToAnimate={discardedTokens.map(
+          ({ startingPosition, ...token }) => {
+            if (startingPosition) {
+              const { x: relativeX, y: relativeY } = getRelativePosition(
+                coasterRefs.current[token.pileId].current,
+                discardPileRef.current,
+              );
+              return {
+                ...token,
+                startingPosition: {
+                  x: startingPosition.x - relativeX,
+                  y: startingPosition.y - relativeY,
+                },
+              };
+            }
 
-            setAnimating(true);
-          }}
-          onAnimationEnd={() => {
-            setAnimating(false);
-          }}
-        />
-      </DiscardCenter>
-    </PileWrapper>
+            return token;
+          },
+        )}
+        onAnimationStart={() => {
+          const {
+            id,
+            tokens: [{ token }],
+          } = selectedTokenState;
+          dispatch(id, token);
+
+          setAnimating(true);
+        }}
+        onAnimationComplete={() => {
+          setAnimating(false);
+        }}
+      />
+    </Circle>
   );
 }

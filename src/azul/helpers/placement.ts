@@ -1,6 +1,6 @@
 import random from 'random';
 
-import { EMPTY, TOKENS } from '../constants/board';
+import { COLUMNS, EMPTY, TOKENS } from '../constants/board';
 import { type Position } from '../types/board';
 
 export interface PositionedElements {
@@ -47,7 +47,7 @@ function isInsideCircle(params: {
   const dx = x + elementWidth / 2 - radius;
   const dy = y + elementHeight / 2 - radius;
 
-  return dx * dx + dy * dy <= radius * radius;
+  return x < dx && x >= 0 && y < dy && y >= 0;
 }
 
 export function placeRandomElementsInCircle<T>(params: {
@@ -79,10 +79,10 @@ export function placeRandomElementsInCircle<T>(params: {
       const y = random.int(0, 2 * radius - elementHeight + 1);
 
       const newElement: PositionedElements & T = {
+        ...elements[i],
         width: elementWidth,
         height: elementHeight,
         position: { x, y },
-        ...elements[i],
       };
 
       // Check if the element is inside the circle and not overlapping
@@ -95,9 +95,7 @@ export function placeRandomElementsInCircle<T>(params: {
       });
       if (
         (insideCircle || tries > 8) &&
-        (allowOverlap
-          ? tries > 8
-          : !isOverlapping(positionedElements, newElement))
+        (allowOverlap || !isOverlapping(positionedElements, newElement))
       ) {
         positionedElements.push(newElement);
         placedElements.push(newElement);
@@ -119,47 +117,56 @@ export function placeRandomElementsInCircle<T>(params: {
  * @param count Number of elements to place.
  * @returns Array of elements with their positions.
  */
+export const getCoasterSize = (params: {
+  radius: number;
+  n: number;
+  spacing?: number;
+}) => {
+  const { radius, n, spacing = 0 } = params;
+  // Calculate total circumference of the circle
+  const circumference = 2 * Math.PI * radius;
+
+  // Calculate available arc length for elements
+  const availableArcLength = circumference - n * spacing;
+
+  // Calculate the radius of each circular element
+  const elementDiameter = availableArcLength / n;
+
+  return Math.min(elementDiameter / 2, (4 * radius) / n);
+};
+
 export function arrangeItemsInCircle(params: {
   radius: number;
-  width: number;
-  height: number;
   n: number;
-}): PositionedElements[] {
-  const { radius, width, height, n } = params;
-  const elements: PositionedElements[] = [];
+  spacing?: number;
+}): {
+  elementDiameter: number;
+  positions: Position[];
+} {
+  const { radius, n } = params;
+  const elementDiameter = getCoasterSize(params);
+  const elementRadius = elementDiameter / 2;
 
-  const centerX = radius;
-  const centerY = radius;
+  // Adjust placement radius to account for the element radius
+  const placementRadius = radius - elementRadius;
+
+  // Calculate positions
+  const positions: Position[] = [];
   const angleIncrement = (2 * Math.PI) / n;
 
   for (let i = 0; i < n; i++) {
     const angle = i * angleIncrement;
 
-    // Calculate the position for the center of the element
-    const x = centerX + (radius - width / 2) * Math.cos(angle) - width / 2;
-    const y = centerY + (radius - height / 2) * Math.sin(angle) - height / 2;
+    // Place first element at (0, size / 2) and others equidistantly
+    const x = placementRadius * (Math.cos(angle) + 1);
+    const y = placementRadius * (Math.sin(angle) + 1);
 
-    // Ensure the element is fully within the circular surface
-    if (
-      (x + width / 2 - centerX) ** 2 + (y + height / 2 - centerY) ** 2 <=
-      radius ** 2
-    ) {
-      elements.push({
-        width,
-        height,
-        position: { x, y },
-      });
-    } else {
-      throw new Error(
-        'Element placement would extend outside the circular surface.',
-      );
-    }
+    positions.push({ x, y });
   }
 
-  return elements;
+  return { elementDiameter, positions };
 }
 
-const COLUMNS = 5;
 const rows = new Array<null | typeof EMPTY>(COLUMNS).fill(null);
 
 export function initializeEmptyRows() {

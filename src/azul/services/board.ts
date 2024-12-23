@@ -1,13 +1,16 @@
 import { Randomizer } from '@shared/services/randomizer';
 import random from 'random';
 
-import { PILE_RADIUS, TOKENS, TOKEN_SIZE } from '../constants/board';
-import { placeRandomElementsInCircle } from '../helpers/placement';
+import { NUM_PILES, PILE_SIZE, TOKENS } from '../constants/board';
+import {
+  getCoasterSize,
+  placeRandomElementsInCircle,
+} from '../helpers/placement';
 import { type Pile, type PlayedToken, type Token } from '../types/board';
 
 import { Player } from './player';
 
-const PILE_SIZE = 4;
+const TOKEN_COUNT = 4;
 
 const DISCARD_RADIUS: Record<number, number> = {
   2: 150,
@@ -15,17 +18,12 @@ const DISCARD_RADIUS: Record<number, number> = {
   4: 364 / 2,
 };
 
-const NUM_PILES: Record<number, number> = {
-  2: 5,
-  3: 7,
-  4: 9,
-};
-
 export class BoardState {
-  discards: Array<PlayedToken>;
-  players: Array<Player>;
-  piles: Array<Pile>;
+  discards = new Array<PlayedToken>();
+  players = new Array<Player>();
+  piles = new Array<Pile>();
   randomizer: Randomizer<Token>;
+  activePlayer = 0;
 
   constructor(players = 2) {
     this.players = Array.from(
@@ -36,25 +34,35 @@ export class BoardState {
       new Array(20).fill(token),
     );
     this.randomizer = new Randomizer(deck);
-    this.discards = [];
 
-    this.piles = this.shuffleTokens();
+    this.shuffleTokens();
   }
 
-  shuffleTokens(): Array<Pile> {
+  shuffleTokens() {
     const players = this.players.length;
-    return [...new Array(NUM_PILES[players])].map(() => {
+    const coasterSize = getCoasterSize({
+      n: NUM_PILES[players],
+      radius: PILE_SIZE / 2,
+    });
+
+    const size = Math.floor(coasterSize / 4);
+    this.piles = [...new Array(NUM_PILES[players])].map((_, idx) => {
+      const hasTokens = this.piles[idx]?.tokens?.length;
       const placements = placeRandomElementsInCircle({
-        radius: PILE_RADIUS[players],
-        elementWidth: TOKEN_SIZE[players],
-        elementHeight: TOKEN_SIZE[players],
-        elements: Array.from({ length: PILE_SIZE }, () => ({
-          token: this.getToken(),
-        })),
+        radius: Math.floor(coasterSize / 2),
+        elementWidth: size,
+        elementHeight: size,
+        elements: hasTokens
+          ? this.piles[idx].tokens
+          : Array.from({ length: TOKEN_COUNT }, () => ({
+              token: this.getToken(),
+              width: size,
+              height: size,
+            })),
       });
 
       return {
-        id: String(random.float()),
+        id: this.piles[idx]?.id ?? String(idx ? random.float() : 0),
         tokens: placements,
       };
     });
@@ -97,8 +105,8 @@ export class BoardState {
           token,
           pileId: id,
         })),
-      elementWidth: TOKEN_SIZE[players],
-      elementHeight: TOKEN_SIZE[players],
+      elementWidth: tokens[0].width,
+      elementHeight: tokens[0].height,
       startingElements: this.discards,
     });
     this.discards.push(...discardedTokens);
@@ -107,5 +115,19 @@ export class BoardState {
       discardedTokens,
       tokensToPlay: tokens.filter(({ token }) => token === selectedToken),
     };
+  }
+
+  finishTurn(pileId: string) {
+    this.piles = this.piles.map((pile) => {
+      if (pile.id === pileId) {
+        return {
+          ...pile,
+          tokens: [],
+        };
+      }
+      return pile;
+    });
+
+    this.activePlayer = (this.activePlayer + 1) % this.players.length;
   }
 }
