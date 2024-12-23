@@ -1,6 +1,6 @@
 import { coord } from '@shared/helpers/grid';
 import { Box } from '@styled/jsx';
-import { Square } from '@ui/Square';
+import { Square } from '@ui/Motion';
 
 import { WALL_CONFIGS } from '../../constants/board';
 import { getWallConfig } from '../../helpers/board';

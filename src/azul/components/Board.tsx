@@ -1,5 +1,5 @@
 import { Flex, type FlexProps, Grid, GridItem } from '@styled/jsx';
-import { type ReactNode } from 'react';
+import { type MutableRefObject, type ReactNode } from 'react';
 
 interface Props<T> extends Partial<FlexProps> {
   items: Array<Array<T>>;
@@ -11,12 +11,14 @@ interface Props<T> extends Partial<FlexProps> {
       rowIdx: number;
     },
   ): ReactNode;
+  boardRef?: MutableRefObject<HTMLDivElement | null>;
 }
 export function Board<T>({
   items,
   renderItem,
   onHover,
   children,
+  boardRef,
   ...rest
 }: Props<T>) {
   return (
@@ -25,6 +27,7 @@ export function Board<T>({
       flexDirection="column"
       gap="2"
       position="relative"
+      ref={boardRef}
       {...rest}
     >
       {items.map((row, rowIdx) => (

@@ -1,78 +1,70 @@
-import { Flex, styled } from '@styled/jsx';
+import { Box, Flex } from '@styled/jsx';
 import { type RefObject, useEffect, useRef, useState } from 'react';
 
 import coaster from '../assets/coaster.svg';
-import { tokenSize } from '../constants/recipes';
 import { useAzulContext } from '../hooks/useAzulContext';
-import { type AddListener } from '../hooks/useEvent';
 import { type Pile, type Token as TokenType } from '../types/board';
 
 import { Token } from './Token';
 
 interface Props {
-  addEventListener: AddListener<string>;
+  size: number;
   pile: Pile;
   returnTokens(tokens: Pile, selectedToken: TokenType): void;
   addRef(id: string, ref: RefObject<HTMLDivElement | null>): () => void;
   playActive: boolean;
 }
 
-const Img = styled('img', {
-  variants: {
-    numPlayers: {
-      2: {
-        width: '250px',
-      },
-      3: {
-        width: '200px',
-      },
-      4: {
-        width: '180px',
-      },
-    },
-  },
-});
-
 export function Coaster({
+  size,
   playActive,
   pile,
   returnTokens,
-  addEventListener,
   addRef,
 }: Props) {
-  const { players } = useAzulContext();
+  const { addListener } = useAzulContext();
   const ref = useRef<HTMLDivElement>(null);
   const [selectedTokenColor, setSelectedTokenColor] = useState('');
   const [hoveredColor, setHoveredColor] = useState('');
 
   useEffect(() => {
-    const unsubscribe = addEventListener(pile.id, (selectedToken: string) => {
+    const unsubscribe = addListener(pile.id, (selectedToken: string) => {
       setSelectedTokenColor(selectedToken);
     });
-    const removeRef = addRef(pile.id, ref);
 
     return () => {
       unsubscribe();
+    };
+  }, [addListener, pile.id]);
+
+  useEffect(() => {
+    const removeRef = addRef(pile.id, ref);
+
+    return () => {
       removeRef();
     };
-  }, [addEventListener, addRef, pile.id]);
+  }, [addRef, pile.id]);
 
   return (
-    <Flex position="relative" ref={ref}>
-      <Img numPlayers={players} src={coaster} />
+    <Box position="relative" ref={ref}>
+      <img style={{ width: size }} src={coaster} />
       {pile.tokens.map(
-        ({ token, position }, idx) =>
+        ({ token, position: { x, y }, width, height }, idx) =>
           (!selectedTokenColor || selectedTokenColor === token) && (
             <Flex
               display="inline-flex"
               position="absolute"
               key={idx}
-              style={{ top: position.y, left: position.x }}
+              style={{
+                left: x,
+                top: y,
+              }}
             >
               <Token
-                className={tokenSize({
-                  numPlayers: players,
-                })}
+                style={{
+                  width,
+                  height,
+                }}
                 cursor={playActive ? 'default' : 'pointer'}
                 onClick={() => {
                   if (!playActive) {
@@ -93,6 +85,6 @@ export function Coaster({
             </Flex>
           ),
       )}
-    </Flex>
+    </Box>
   );
 }

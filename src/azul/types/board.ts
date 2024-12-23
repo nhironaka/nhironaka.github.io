@@ -12,10 +12,11 @@ export interface Position {
 
 export interface Pile {
   id: string;
-  tokens: Array<{
-    position: Position;
-    token: Token;
-  }>;
+  tokens: Array<
+    PositionedElements & {
+      token: Token;
+    }
+  >;
 }
 
 export interface PlayedToken extends PositionedElements {

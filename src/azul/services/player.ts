@@ -1,9 +1,9 @@
-import { type EMPTY } from '../constants/board';
+import { EMPTY } from '../constants/board';
 import {
   initializeEmptyPlays,
   initializeEmptyRows,
 } from '../helpers/placement';
-import { type Token } from '../types/board';
+import { type PlayedToken, type Token } from '../types/board';
 
 export class Player {
   name: string;
@@ -21,5 +21,24 @@ export class Player {
     this.board = initializeEmptyRows();
     this.played = initializeEmptyPlays();
     this.graveyard = new Array<Token>();
+  }
+
+  playToken(params: {
+    hoveringRow: number;
+    shadowTokens: Array<Token>;
+    playingTokens: Array<PlayedToken>;
+  }) {
+    const { hoveringRow, shadowTokens, playingTokens } = params;
+    let playedToken = 0;
+    this.board[hoveringRow] =
+      this.board[hoveringRow]?.map((token) => {
+        if (token === EMPTY) {
+          return playingTokens[playedToken++]?.token ?? EMPTY;
+        }
+        return token;
+      }) ?? [];
+    if (shadowTokens.length > 0) {
+      this.graveyard = this.graveyard.concat(shadowTokens);
+    }
   }
 }
